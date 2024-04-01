@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "423472232062",
+    "project_id": "hifive-f43ec",
+    "storage_bucket": "hifive-f43ec.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:423472232062:android:ac80654b10a1b3b0570a2f",
+        "android_client_info": {
+          "package_name": "com.example.hifive"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOik8Eml67mLzN8dKVuMdyrN09sZFV3y4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
