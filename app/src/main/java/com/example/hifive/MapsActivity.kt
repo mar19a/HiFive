@@ -1,21 +1,30 @@
 package com.example.hifive
 
-import androidx.appcompat.app.AppCompatActivity
+import android.R.attr.text
+import android.content.Intent
+import android.location.Address
+import android.location.Geocoder
 import android.os.Bundle
-
+import androidx.appcompat.app.AppCompatActivity
+import com.example.hifive.Post.PostActivity
+import com.example.hifive.databinding.ActivityMapsBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.example.hifive.databinding.ActivityMapsBinding
+import kotlin.properties.Delegates
+
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
+    private lateinit var addr: String
+    private lateinit var latlong: String
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
-
+    private var marker: Marker? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -26,6 +35,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        binding.send.setOnClickListener() {
+            val intent = Intent(this@MapsActivity, PostActivity::class.java)
+            intent.putExtra("address", addr)
+            intent.putExtra("latlong", latlong)
+            setResult(RESULT_OK, intent)
+            finish()
+        }
     }
 
     /**
@@ -39,10 +56,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        //mMap.animateCamera(CameraUpdateFactory.zoomTo(9.0f))
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(42.3601, -71.0589)))
 
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        googleMap.setOnMapClickListener { latLng ->
+            //implement some geocoding
+            //val geocoder = Geocoder(this)
+            //val addresses: MutableList<Address>? = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+
+            // Add a marker at the tapped location
+            marker?.remove()
+            marker = googleMap.addMarker(MarkerOptions().position(latLng).title("Event")) //placeholder
+            addr = "Los Angeles" //placeholder
+            latlong = "${latLng.latitude},${latLng.longitude}"
+        }
+
     }
+
 }

@@ -76,7 +76,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/location"
-        app:layout_constraintBottom_toTopOf="@+id/post" >
+        app:layout_constraintBottom_toTopOf="@+id/event" >
 
         <Button
             android:id="@+id/date"
@@ -100,6 +100,30 @@
 
 
     </LinearLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/event"
+        style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/datetime"
+        app:layout_constraintBottom_toTopOf="@+id/post"
+        android:hint="Event Type"
+        >
+
+        <AutoCompleteTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            app:simpleItems="@array/event_options"
+            />
+
+    </com.google.android.material.textfield.TextInputLayout>
 
 
     <LinearLayout
