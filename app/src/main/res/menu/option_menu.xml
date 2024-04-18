@@ -2,13 +2,9 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/like"
-        android:icon="@drawable/heart"
-        android:title="like"
+        android:id="@+id/options"
+        android:icon="@drawable/bars"
+        android:title="options"
         app:showAsAction="always"/>
-    <item
-        android:id="@+id/message"
-        android:icon="@drawable/send"
-        android:title="message"
-        app:showAsAction="always"/>
+
 </menu>

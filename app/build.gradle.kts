@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
     id("com.google.gms.google-services")
+    alias(libs.plugins.googleAndroidLibrariesMapsplatformSecretsGradlePlugin)
 }
 
 
@@ -78,4 +79,5 @@ dependencies {
 
     implementation( libs.timeago)
 
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
 }

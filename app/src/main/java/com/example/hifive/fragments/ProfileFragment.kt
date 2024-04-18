@@ -33,7 +33,6 @@ class ProfileFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         binding = FragmentProfileBinding.inflate(inflater, container, false)
 
         binding.editProfile.setOnClickListener {
@@ -42,6 +41,10 @@ class ProfileFragment : Fragment() {
             activity?.startActivity(intent)
             activity?.finish()
         }
+
+        binding.logoutButton.setOnClickListener {
+            logoutUser()
+        }
         viewPagerAdapter=ViewPagerAdapter(requireActivity().supportFragmentManager)
         viewPagerAdapter.addFragments(MyPostFragment(),"My Post")
         viewPagerAdapter.addFragments(MyReelsFragment(),"My Reels")
@@ -49,6 +52,16 @@ class ProfileFragment : Fragment() {
         binding.tabLayout.setupWithViewPager(binding.viewPager)
 
         return binding.root
+    }
+
+    private fun logoutUser() {
+        Firebase.auth.signOut() // Log out from Firebase
+
+        val intent = Intent(activity, LoginActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        startActivity(intent)
+        activity?.finish() // Ensure the user cannot navigate back to the ProfileFragment without logging in again.
     }
 
     companion object {
@@ -69,7 +82,6 @@ class ProfileFragment : Fragment() {
                         Picasso.get().load(user.image).into(binding.profileImage)
                     }
                 } else {
-                    // User data not found
                     handleUserDataNotFound()
                 }
             }
@@ -79,22 +91,32 @@ class ProfileFragment : Fragment() {
     }
 
     private fun handleUserDataNotFound() {
-        // Option 1: Show a toast message
         Toast.makeText(
             context,
             "User data not found. Please complete your profile.",
             Toast.LENGTH_LONG
         ).show()
+
+
+        val intent = Intent(activity, SignUpActivity::class.java).apply {
+            putExtra("MODE", 1)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+
+        activity?.startActivity(intent) ?: Toast.makeText(context, "Error starting activity. Please try again later.", Toast.LENGTH_SHORT).show()
     }
 
+
     private fun handleUserNotLoggedIn() {
-        // Show a toast message as immediate feedback.
         Toast.makeText(context, "You must be logged in to view this page. Redirecting to login...", Toast.LENGTH_LONG).show()
 
-        // Redirect to LoginActivity for user to log in.
-        val intent = Intent(activity, LoginActivity::class.java)
-        startActivity(intent)
-        activity?.finish() // Finish the current activity so the user can't navigate back to it without logging in.
+
+        val intent = Intent(activity, LoginActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+
+
+        activity?.startActivity(intent) ?: Toast.makeText(context, "Error starting activity. Please try again later.", Toast.LENGTH_SHORT).show()
     }
 
 
