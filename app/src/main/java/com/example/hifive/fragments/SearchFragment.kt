@@ -14,6 +14,7 @@ import com.example.hifive.Models.User
 import com.example.hifive.adapters.SearchAdapter
 import com.example.hifive.databinding.FragmentSearchBinding
 import com.example.hifive.utils.USER_NODE
+import com.squareup.picasso.Picasso
 
 
 class SearchFragment : Fragment() {
@@ -35,6 +36,8 @@ class SearchFragment : Fragment() {
         binding.rv.layoutManager = LinearLayoutManager(requireContext())
         adapter = SearchAdapter(requireContext(), userList)
         binding.rv.adapter = adapter
+
+        Picasso.get().load("https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=test").into(binding.testQr)
 
         Firebase.firestore.collection(USER_NODE).get().addOnSuccessListener {
 

@@ -69,6 +69,9 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
+    //google play services nearby API
+    implementation("com.google.android.gms:play-services-nearby:18.5.0")
+
     implementation("com.makeramen:roundedimageview:2.3.0")
 
     implementation ("com.github.bumptech.glide:glide:4.15.1")

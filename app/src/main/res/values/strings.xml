@@ -49,4 +49,10 @@
     </string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="error_missing_permissions">Cannot start without required permissions</string>
+
+    <!-- Strings used for add user UI -->
+    <string name="searching_text">Searching For Nearby Users...</string>
+    <string name="connected_text">Nearby User Found!</string>
+
 </resources>
