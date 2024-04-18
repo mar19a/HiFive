@@ -39,9 +39,6 @@ class SearchFragment : Fragment() {
         adapter = SearchAdapter(requireContext(), userList)
         binding.rv.adapter = adapter
 
-        //DEBUG testing Picasso endpoint retrieval
-        //Picasso.get().load("https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=test").into(binding.testQr)
-
         //Handler For Add Users Button
         binding.addUsersButton.setOnClickListener {
             val intent = Intent(context, AddUserActivity::class.java)

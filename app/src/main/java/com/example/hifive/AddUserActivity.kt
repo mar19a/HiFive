@@ -10,8 +10,11 @@ import com.google.android.gms.nearby.connection.ConnectionInfo
 import kotlin.random.Random
 import android.widget.Toast
 import android.view.View
+import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.squareup.picasso.Picasso
 
 
 class AddUserActivity : ConnectionsActivity() {
@@ -23,20 +26,46 @@ class AddUserActivity : ConnectionsActivity() {
     //Identification of the user's endpoint for communication
     private var myName = "get user's name and put it here"
 
+    private var mState = State.UNKNOWN
+
     private lateinit var addUserText : TextView
     private lateinit var userIDText : TextView
     private lateinit var connectedIDText : TextView
+
+    private lateinit var qrFrame : ImageView
+
+    private lateinit var sendIdButton : Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_user)
 
         //DEBUG Temporary User ID Generation
-        myName = Random.nextBytes(8).toString()
+        myName = getRandomString(8)
         addUserText = findViewById(R.id.addUserDialog)
         userIDText = findViewById(R.id.debugUserID)
-        userIDText.text = myName
+        userIDText.text = "ID: " + myName
         connectedIDText = findViewById(R.id.debugConnectedID)
+        qrFrame = findViewById(R.id.testQr)
+        Picasso.get().load("https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="+myName).into(qrFrame)
+
+        sendIdButton = findViewById(R.id.sendIDButton)
+        sendIdButton.setOnClickListener{
+            send(Payload.fromBytes(myName.toByteArray(Charsets.UTF_8)))
+        }
+    }
+
+    private fun getRandomString(length: Int) : String {
+        val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
+        return (1..length)
+            .map { allowedChars.random() }
+            .joinToString("")
+    }
+
+    override fun onStart(){
+        super.onStart()
+
+        setState(State.SEARCHING)
     }
 
     //Required Getters for Class implementation
@@ -45,18 +74,51 @@ class AddUserActivity : ConnectionsActivity() {
     override fun getStrategy(): Strategy { return STRATEGY }
 
 
+    override fun onBackPressed() {
+        disconnectFromAllEndpoints()
+    }
+    override fun onEndpointDiscovered(endpoint: Endpoint?) {
+        stopDiscovering()
+        connectToEndpoint(endpoint)
+    }
+    override fun onConnectionInitiated(endpoint: Endpoint?, connectionInfo: ConnectionInfo?) {
+        acceptConnection(endpoint)
+    }
+
+    override fun onEndpointConnected(endpoint: Endpoint?) {
+        Toast.makeText(this, "Connected to" + endpoint?.name, Toast.LENGTH_SHORT).show()
+        setState(State.CONNECTED)
+    }
+
+    override fun onEndpointDisconnected(endpoint: Endpoint?) {
+        Toast.makeText(this, "Disconnected", Toast.LENGTH_SHORT).show()
+        setState(State.SEARCHING)
+    }
+
+    override fun onConnectionFailed(endpoint: Endpoint?) {
+        if(mState == State.SEARCHING){
+            startDiscovering()
+        }
+    }
+
+
+    private fun setState(state : State){
+        val oldState = mState
+        mState = state
+        onStateChanged(oldState, state)
+    }
     //State Machine
     private fun onStateChanged(oldState : State, newState : State){
         //Change Nearby Connections behavior to new state
         when(newState){
             State.SEARCHING -> {
-                addUserText.text = R.string.searching_text.toString()
+                addUserText.text = "Searching For Nearby Users..."
                 disconnectFromAllEndpoints()
                 startDiscovering()
                 startAdvertising()
             }
             State.CONNECTED -> {
-                addUserText.text = R.string.connected_text.toString()
+                addUserText.text = "Nearby User Found!"
                 stopDiscovering()
                 stopAdvertising()
             }
@@ -81,7 +143,7 @@ class AddUserActivity : ConnectionsActivity() {
 
     override fun onReceive(endpoint: Endpoint?, payload: Payload?) {
         if (payload!!.type == Payload.Type.BYTES){
-            connectedIDText.text = payload.toString()
+            connectedIDText.text = payload.asBytes().toString()
             //TODO: Parse Bytes Here And Display Follow RV for User
         }
     }
