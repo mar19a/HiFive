@@ -16,9 +16,9 @@
         android:icon="@drawable/plus"
         android:title="Add"/>
     <item
-        android:id="@+id/reel"
-        android:icon="@drawable/video"
-        android:title="reel"/>
+        android:id="@+id/maps"
+        android:icon="@drawable/maps"
+        android:title="Maps"/>
     <item
         android:id="@+id/profile"
         android:icon="@drawable/user_icon"

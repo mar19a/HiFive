@@ -20,10 +20,10 @@
         android:label="fragment_add"
         tools:layout="@layout/fragment_add" />
     <fragment
-        android:id="@+id/reel"
-        android:name="com.example.hifive.fragments.ReelFragment"
-        android:label="fragment_reel"
-        tools:layout="@layout/fragment_reel" />
+        android:id="@+id/maps"
+        android:name="com.example.hifive.fragments.MapsFragment"
+        android:label="fragment_maps"
+        tools:layout="@layout/fragment_maps" />
     <fragment
         android:id="@+id/profile"
         android:name="com.example.hifive.fragments.ProfileFragment"
