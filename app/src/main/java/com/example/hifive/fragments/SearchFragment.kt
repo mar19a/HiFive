@@ -1,11 +1,13 @@
 package com.example.hifive.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.hifive.AddUserActivity
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
@@ -37,7 +39,14 @@ class SearchFragment : Fragment() {
         adapter = SearchAdapter(requireContext(), userList)
         binding.rv.adapter = adapter
 
-        Picasso.get().load("https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=test").into(binding.testQr)
+        //DEBUG testing Picasso endpoint retrieval
+        //Picasso.get().load("https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=test").into(binding.testQr)
+
+        //Handler For Add Users Button
+        binding.addUsersButton.setOnClickListener {
+            val intent = Intent(context, AddUserActivity::class.java)
+            startActivity(intent)
+        }
 
         Firebase.firestore.collection(USER_NODE).get().addOnSuccessListener {
 

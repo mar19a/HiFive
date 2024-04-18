@@ -16,6 +16,27 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
+    <TextView
+        android:id="@+id/debugUserID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="96dp"
+        android:layout_marginTop="124dp"
+        android:text="userID"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/debugConnectedID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="96dp"
+        android:layout_marginTop="164dp"
+        android:text="otherUserID"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ImageView
         android:id="@+id/testQr"
         android:layout_width="200dp"
