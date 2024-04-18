@@ -13,6 +13,7 @@
         android:background="#FFFFFF"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
+        android:layout_marginBottom="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -20,13 +21,15 @@
 
     <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/select_image"
-        android:layout_width="300dp"
-        android:layout_height="400dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:scaleType="fitCenter"
         android:src="@drawable/post"
+        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/materialToolbar"
         app:layout_constraintTop_toBottomOf="@+id/materialToolbar"
+        app:layout_constraintBottom_toTopOf="@+id/caption"
         app:riv_border_color="#333333"
         app:riv_border_width="2dip"
         app:riv_corner_radius="20dip" />
@@ -41,7 +44,7 @@
         app:boxStrokeColor="@color/pink"
         app:layout_constraintEnd_toEndOf="@+id/select_image"
         app:layout_constraintStart_toStartOf="@+id/select_image"
-        app:layout_constraintTop_toBottomOf="@+id/select_image">
+        app:layout_constraintTop_toBottomOf="@+id/select_image" >
 
         <com.google.android.material.textfield.TextInputEditText
 
@@ -50,6 +53,56 @@
             android:visibility="visible" />
 
     </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/location"
+        style="@style/Widget.Material3.Button.ElevatedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:hint="Choose Location"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/caption"
+        app:layout_constraintBottom_toTopOf="@+id/datetime"
+        app:strokeColor="@color/black" />
+
+
+    <LinearLayout
+        android:id="@+id/datetime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/location"
+        app:layout_constraintBottom_toTopOf="@+id/post" >
+
+        <Button
+            android:id="@+id/date"
+            style="@style/Widget.Material3.Button.ElevatedButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_weight="1"
+            android:hint="Set Date"
+            app:strokeColor="@color/black" />
+
+        <Button
+            android:id="@+id/time"
+            style="@style/Widget.Material3.Button.ElevatedButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_weight="1"
+            android:hint="Set Time"
+            app:strokeColor="@color/black" />
+
+
+    </LinearLayout>
 
 
     <LinearLayout
@@ -60,24 +113,24 @@
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/caption">
+        app:layout_constraintBottom_toTopOf="@+id/textView4" >
 
         <ImageView
             android:id="@+id/imageView2"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:padding="5dp"
-
+            android:layout_marginLeft="10dp"
             android:src="@drawable/post" />
 
         <TextView
             android:id="@+id/textView3"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginLeft="20dp"
             android:layout_weight="1"
             android:gravity="center_vertical"
-            android:text="Share to Post"
+            android:layout_marginLeft="10dp"
+            android:text="Post Event"
             android:textSize="16sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -86,13 +139,14 @@
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:paddingRight="40dp"
-        android:text="Your Post May be appear in Posts and can be seen on the posts tab under your profile"
+        android:paddingRight="20dp"
+        android:paddingLeft="20dp"
+        android:text="Your post may appear in your followers' feeds and can be seen on the posts tab under your profile."
         app:layout_constraintStart_toStartOf="@+id/post"
-        app:layout_constraintTop_toBottomOf="@+id/post" />
+        app:layout_constraintBottom_toTopOf="@+id/cancelpost" />
 
     <LinearLayout
+        android:id="@+id/cancelpost"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -100,17 +154,17 @@
         android:padding="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView4">
+        app:layout_constraintBottom_toBottomOf="parent" >
 
         <Button
             android:id="@+id/cancel_button"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/Widget.Material3.Button.TonalButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:layout_weight="1"
             android:text="Cancel"
-            android:textColor="@android:color/darker_gray"
+            android:textColor="@android:color/black"
             app:strokeColor="@color/pink" />
 
         <Button
