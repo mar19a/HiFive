@@ -38,10 +38,12 @@
     <com.google.android.material.textfield.TextInputLayout
 
         android:id="@+id/caption"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:hint="Write a caption"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:hint="Write a description"
         app:boxStrokeColor="@color/pink"
         app:layout_constraintEnd_toEndOf="@+id/select_image"
         app:layout_constraintStart_toStartOf="@+id/select_image"
@@ -51,6 +53,7 @@
 
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxLines="2"
             android:visibility="visible" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -63,8 +66,8 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:layout_marginTop="10dp"
-        android:layout_marginLeft="40dp"
-        android:layout_marginRight="40dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         android:hint="Choose Location"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -112,8 +115,8 @@
         style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="40dp"
-        android:layout_marginRight="40dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         android:layout_marginBottom="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

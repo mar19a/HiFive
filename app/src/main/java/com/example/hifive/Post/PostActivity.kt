@@ -1,9 +1,13 @@
 package com.example.hifive.Post
 
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Intent
+import android.icu.util.Calendar
 import android.os.Bundle
 import android.util.Log
+import android.widget.TimePicker
 import androidx.activity.result.contract.ActivityResultContracts
 
 import androidx.appcompat.app.AppCompatActivity
@@ -22,6 +26,7 @@ import com.example.hifive.utils.uploadImage
 import com.google.android.gms.maps.MapFragment
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import java.util.Locale
 
 
 class PostActivity : AppCompatActivity() {
@@ -107,6 +112,51 @@ class PostActivity : AppCompatActivity() {
             launcher2.launch(Intent(this@PostActivity, MapsActivity::class.java))
         }
 
+        binding.date.setOnClickListener {
+            // Get the current date
+            val calendar = Calendar.getInstance()
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH)
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            // Create a DatePickerDialog and show it when the button is clicked
+            val datePickerDialog = DatePickerDialog(
+                this,
+                DatePickerDialog.OnDateSetListener { _, selectedYear, selectedMonth, selectedDay ->
+                    // Handle the selected date
+                    val selectedDate = "$selectedDay/${selectedMonth + 1}/$selectedYear"
+                    // You can do something with the selectedDate here, such as displaying it in a TextView
+                    binding.date.text = selectedDate
+                },
+                year,
+                month,
+                day
+            )
+            datePickerDialog.show()
+        }
+
+        binding.time.setOnClickListener {
+            // Get the current time
+            val calendar = Calendar.getInstance()
+            val hour = calendar.get(Calendar.HOUR_OF_DAY)
+            val minute = calendar.get(Calendar.MINUTE)
+
+            // Create a TimePickerDialog and show it when the button is clicked
+            val timePickerDialog = TimePickerDialog(
+                this,
+                TimePickerDialog.OnTimeSetListener { _: TimePicker, selectedHour: Int, selectedMinute: Int ->
+                    // Handle the selected time
+                    val selectedTime = format12HourTime(selectedHour, selectedMinute)
+                    // You can do something with the selectedTime here, such as displaying it in a TextView
+                    binding.time.text = selectedTime
+                },
+                hour,
+                minute,
+                false // Set to true to use 24-hour format, false for 12-hour format
+            )
+            timePickerDialog.show()
+        }
+
 //        binding.event.setOnClickListener {
 //            launcher2.launch(Intent(this@PostActivity, MapsActivity::class.java))
 //        }
@@ -139,7 +189,20 @@ class PostActivity : AppCompatActivity() {
             }
 
 
+
+
         }
+
+
+    }
+
+    private fun format12HourTime(hourOfDay: Int, minute: Int): String {
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
+        calendar.set(Calendar.MINUTE, minute)
+        val format = if (calendar.get(Calendar.AM_PM) == Calendar.AM) "AM" else "PM"
+        val hour = if (hourOfDay % 12 == 0) 12 else hourOfDay % 12
+        return String.format(Locale.getDefault(), "%02d:%02d %s", hour, minute, format)
     }
 
 }
