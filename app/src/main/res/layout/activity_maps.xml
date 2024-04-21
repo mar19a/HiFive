@@ -26,7 +26,8 @@
         android:layout_height="wrap_content"
         android:text="Confirm Location"
         android:layout_margin="20dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:enabled="false"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -76,6 +76,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             else
                 ""
             latlong = "${llng.latitude},${llng.longitude}"
+            binding.send.isEnabled = true
         }
 
     }
