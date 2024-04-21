@@ -26,11 +26,20 @@ import com.google.android.gms.maps.model.LatLng
 
 class PostActivity : AppCompatActivity() {
 
+    private var addressData: String? = null
+
     private lateinit var addr: String
+
+    private var locationData: String? = null
 
     private lateinit var loc: String
 
     private var etype = "Other"
+
+    private var loc_enabled = false
+
+    private var image_enabled = false
+
 
     private val binding by lazy {
         ActivityPostBinding.inflate(layoutInflater)
@@ -43,22 +52,39 @@ class PostActivity : AppCompatActivity() {
                 if (url != null) {
                     binding.selectImage.setImageURI(uri)
                     imageUrl = url
+                    image_enabled = true
+                    if (loc_enabled) {
+                        binding.postButton.isEnabled = true
+                    }
                 }
 
             }
         }
+
     }
 
     private val launcher2 = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
 
-        Log.d("lnch2", result.data?.getStringExtra("address").toString())
-        addr = result.data?.getStringExtra("address").toString()
-        Log.d("lnch2", addr)
-        Log.d("lnch2", result.data?.getStringExtra("latlong").toString())
-        loc = result.data?.getStringExtra("latlong").toString()
-        Log.d("lnch2", loc)
-
-        binding.location.text = addr
+        //Log.d("lnch2", result.data?.getStringExtra("address").toString())
+        addressData = result.data?.getStringExtra("address")//toString()
+        locationData = result.data?.getStringExtra("latlong")//.toString()
+        //Log.d("lnch2", addr)
+        if (addressData != null && locationData != null) {
+            addr = result.data?.getStringExtra("address").toString()
+            loc = result.data?.getStringExtra("latlong").toString()
+            binding.location.text = addr
+            loc_enabled = true
+            if (image_enabled) {
+                binding.postButton.isEnabled = true
+            }
+        } else {
+            binding.location.text = ""
+            binding.location.hint = "Choose Location"
+            loc_enabled = false
+            binding.postButton.isEnabled = false
+        }
+        //Log.d("lnch2", result.data?.getStringExtra("latlong").toString())
+        //Log.d("lnch2", loc)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
