@@ -1,16 +1,17 @@
 package com.example.hifive
 
-import android.R.attr.text
 import android.content.Intent
-import android.location.Address
+
 import android.location.Geocoder
-import android.os.Build
+
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.example.hifive.Post.PostActivity
 import com.example.hifive.databinding.ActivityMapsBinding
+
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -20,21 +21,31 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import java.io.IOException
 import java.util.Locale
-import kotlin.properties.Delegates
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var addr: String
+
     private lateinit var latlong: String
+
     private lateinit var mMap: GoogleMap
+
     private lateinit var binding: ActivityMapsBinding
+
+    private lateinit var userLocation: String
+
+    private val default = LatLng(0.0, 0.0)
+
     private var marker: Marker? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        userLocation = intent.getStringExtra("location").toString()
+        Log.d("MapsActivity", userLocation)
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
@@ -61,11 +72,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        //mMap.animateCamera(CameraUpdateFactory.zoomTo(9.0f))
-        var yours = LatLng(42.3601, -71.0589)
-        //getAddress(llng)
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(42.3601, -71.0589)))
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(yours, 15f))
+//        if (default != null) {
+//            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(default, 15f))
+//        } else {
+//            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(default, 15f))
+//        }
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(convertStringToLatLng(userLocation), 15f))
 
         googleMap.setOnMapClickListener { llng ->
             // Add a marker at the tapped location
@@ -147,6 +159,26 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             Toast.makeText(this, "Error getting address", Toast.LENGTH_SHORT).show()
         }
         return address
+    }
+
+    private fun convertStringToLatLng(latlngString: String): LatLng {
+        // Split the string into latitude and longitude parts
+        val latlngParts = latlngString.split(",")
+
+        // Check if the string has both latitude and longitude parts
+        require(latlngParts.size == 2) { "Invalid LatLng string format: $latlngString" }
+
+        try {
+            // Parse latitude and longitude values from string parts
+            val latitude = latlngParts[0].toDouble()
+            val longitude = latlngParts[1].toDouble()
+
+            // Create and return a new LatLng object
+            return LatLng(latitude, longitude)
+        } catch (e: NumberFormatException) {
+            // Handle parsing errors
+            throw IllegalArgumentException("Invalid latitude or longitude value in LatLng string: $latlngString")
+        }
     }
 
 }
