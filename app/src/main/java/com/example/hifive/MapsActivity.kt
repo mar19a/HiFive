@@ -62,9 +62,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         //mMap.animateCamera(CameraUpdateFactory.zoomTo(9.0f))
-        //var llng = LatLng(40.7614, -73.9776)
+        var yours = LatLng(42.3601, -71.0589)
         //getAddress(llng)
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(42.3601, -71.0589)))
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(42.3601, -71.0589)))
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(yours, 15f))
 
         googleMap.setOnMapClickListener { llng ->
             // Add a marker at the tapped location
