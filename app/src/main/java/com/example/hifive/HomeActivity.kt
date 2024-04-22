@@ -3,11 +3,18 @@ package com.example.hifive
 import android.os.Bundle
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.hifive.databinding.ActivityHomeBinding
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 
 class HomeActivity : AppCompatActivity() {
+
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+    private lateinit var mapsVM: MapsViewModel
 
     private lateinit var binding: ActivityHomeBinding
 
@@ -23,5 +30,11 @@ class HomeActivity : AppCompatActivity() {
         // Passing each menu ID as a set of Ids because each
 
         navView.setupWithNavController(navController)
+
+        mapsVM = ViewModelProvider(this)[MapsViewModel::class.java]
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        mapsVM.findLocation(fusedLocationClient)
     }
 }

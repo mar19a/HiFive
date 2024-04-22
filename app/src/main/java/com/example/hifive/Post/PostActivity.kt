@@ -96,6 +96,9 @@ class PostActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        val value = intent.getStringExtra("location").toString()
+        Log.d("PostActivity", value)
+
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
@@ -109,7 +112,10 @@ class PostActivity : AppCompatActivity() {
         }
 
         binding.location.setOnClickListener {
-            launcher2.launch(Intent(this@PostActivity, MapsActivity::class.java))
+            val intent = Intent(this@PostActivity, MapsActivity::class.java)
+            intent.putExtra("location", value)
+
+            launcher2.launch(intent)
         }
 
         binding.date.setOnClickListener {

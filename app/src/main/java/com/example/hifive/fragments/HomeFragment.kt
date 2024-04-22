@@ -76,7 +76,7 @@ class HomeFragment : Fragment() {
                 tempList.add(post)
             }
             postList.addAll(tempList)
-            Log.d("mapsf", postList.size.toString())
+            Log.d("HomeFragment", postList.size.toString())
             adapter.notifyDataSetChanged()
         }
 
