@@ -19,6 +19,8 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.example.hifive.databinding.ActivityMapsBinding
 import com.example.hifive.databinding.FragmentMapsBinding
 import com.example.hifive.utils.POST
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
@@ -52,8 +54,10 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(42.3601, -71.0589)))
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(42.3601, -71.0589)))
 //        mMap.animateCamera(CameraUpdateFactory.zoomTo(7.0f))
+        var yours = LatLng(42.3601, -71.0589)
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(yours, 15f))
 
         Firebase.firestore.collection(POST).get().addOnSuccessListener {
             var tempList = ArrayList<Post>()
@@ -65,7 +69,20 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                 Log.d("mapsf", tempList[index].eventLoc)
                 var loc = convertStringToLatLng(tempList[index].eventLoc)
                 Log.d("mapsf", loc.toString())
-                mMap.addMarker(MarkerOptions().position(loc).title("Event"))
+                var icon: BitmapDescriptor
+                if (tempList[index].eventType == "Social") {
+                    icon = BitmapDescriptorFactory.fromResource(R.drawable.markertest)
+                } else if (tempList[index].eventType == "Business") {
+                    icon = BitmapDescriptorFactory.fromResource(R.drawable.markertestb)
+                }
+                else {
+                    icon = BitmapDescriptorFactory.fromResource(R.drawable.markertesto)
+                }
+                mMap.addMarker(MarkerOptions()
+                    .position(loc)
+                    .title(tempList[index].title)
+                    .snippet(tempList[index].caption)
+                    .icon(icon))
             }
             postList.addAll(tempList)
             Log.d("mapsf", postList.size.toString())

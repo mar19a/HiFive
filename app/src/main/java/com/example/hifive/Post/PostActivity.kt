@@ -79,9 +79,9 @@ class PostActivity : AppCompatActivity() {
             loc = result.data?.getStringExtra("latlong").toString()
             binding.location.text = addr
             loc_enabled = true
-            if (image_enabled) {
+            //if (image_enabled) {
                 binding.postButton.isEnabled = true
-            }
+            //}
         } else {
             binding.location.text = ""
             binding.location.hint = "Choose Location"
@@ -96,10 +96,10 @@ class PostActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        setSupportActionBar(binding.materialToolbar)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
-        binding.materialToolbar.setNavigationOnClickListener {
+        binding.toolbar.setNavigationOnClickListener {
             startActivity(Intent(this@PostActivity, HomeActivity::class.java))
             finish()
         }
@@ -169,13 +169,13 @@ class PostActivity : AppCompatActivity() {
         binding.postButton.setOnClickListener {
 
             val post: Post = Post(
-                postUrl = imageUrl!!,
+                title = binding.title.editText?.text.toString(),
                 caption = binding.caption.editText?.text.toString(),
                 uid = Firebase.auth.currentUser!!.uid,
                 time = System.currentTimeMillis().toString(),
                 addr = addr,
                 loc = loc,
-                etype = etype
+                etype = binding.event.editText?.text.toString(),
             )
 
             Firebase.firestore.collection(POST).document().set(post).addOnSuccessListener {
