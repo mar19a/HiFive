@@ -36,6 +36,7 @@ class AddFragment : BottomSheetDialogFragment() {
             val intent = Intent(requireContext(), PostActivity::class.java)
             Log.d("AddFragment", mapsVM.getLocation().toString())
             intent.putExtra("location", "${mapsVM.getLocation()?.latitude},${mapsVM.getLocation()?.longitude}")
+            Log.d("AddFragment", "${mapsVM.getLocation()?.latitude},${mapsVM.getLocation()?.longitude}")
             activity?.startActivity(intent)
             activity?.finish()
         }

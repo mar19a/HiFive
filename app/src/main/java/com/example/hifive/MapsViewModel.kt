@@ -20,23 +20,27 @@ class MapsViewModel: ViewModel() {
         get() = _location
 
 
-    @SuppressLint("MissingPermission")
-    fun findLocation(fusedLocationClient: FusedLocationProviderClient) {
+//    @SuppressLint("MissingPermission")
+//    fun findLocation(fusedLocationClient: FusedLocationProviderClient) {
+//
+//        fusedLocationClient.lastLocation
+//            .addOnSuccessListener { loc ->
+//                // Got last known location. In some rare situations this can be null.
+//                if (loc != null) {
+//                    _location.value = LatLng(loc.latitude, loc.longitude)
+//                    Log.d("MapsVM", _location.value.toString())
+//                } else {
+//                    Log.d("MapsVM", _location.value.toString())
+//                }
+//            }
+//            .addOnFailureListener { e ->
+//                // Handle failure to retrieve location
+//                Log.e("MapsVM", "Error getting location: ${e.message}", e)
+//            }
+//    }
 
-        fusedLocationClient.lastLocation
-            .addOnSuccessListener { loc ->
-                // Got last known location. In some rare situations this can be null.
-                if (loc != null) {
-                    _location.value = LatLng(loc.latitude, loc.longitude)
-                    Log.d("MapsVM", _location.value.toString())
-                } else {
-                    Log.d("MapsVM", "null")
-                }
-            }
-            .addOnFailureListener { e ->
-                // Handle failure to retrieve location
-                Log.e("MapsVM", "Error getting location: ${e.message}", e)
-            }
+    fun setLocation(loc: LatLng) {
+        _location.value = loc
     }
 
     fun getLocation(): LatLng? {
