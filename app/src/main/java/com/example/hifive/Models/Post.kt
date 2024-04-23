@@ -41,8 +41,9 @@ class Post {
     }
 
     //everything
-    constructor(title: String, caption: String, uid: String, time: String, addr: String, loc: String, etype: String) {
+    constructor(title: String, postUrl: String, caption: String, uid: String, time: String, addr: String, loc: String, etype: String) {
         this.title = title
+        this.postUrl = postUrl
         this.caption = caption
         this.uid = uid
         this.time = time
@@ -50,6 +51,6 @@ class Post {
         this.eventLoc = loc
         this.eventType = etype
     }
-
-
 }
+
+

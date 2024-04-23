@@ -8,6 +8,7 @@ import android.icu.util.Calendar
 import android.os.Bundle
 import android.util.Log
 import android.widget.TimePicker
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 
 import androidx.appcompat.app.AppCompatActivity
@@ -68,29 +69,30 @@ class PostActivity : AppCompatActivity() {
 
     }
 
-    private val launcher2 = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    private val launcher2 =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
 
-        //Log.d("lnch2", result.data?.getStringExtra("address").toString())
-        addressData = result.data?.getStringExtra("address")//toString()
-        locationData = result.data?.getStringExtra("latlong")//.toString()
-        //Log.d("lnch2", addr)
-        if (addressData != null && locationData != null) {
-            addr = result.data?.getStringExtra("address").toString()
-            loc = result.data?.getStringExtra("latlong").toString()
-            binding.location.text = addr
-            loc_enabled = true
-            //if (image_enabled) {
+            //Log.d("lnch2", result.data?.getStringExtra("address").toString())
+            addressData = result.data?.getStringExtra("address")//toString()
+            locationData = result.data?.getStringExtra("latlong")//.toString()
+            //Log.d("lnch2", addr)
+            if (addressData != null && locationData != null) {
+                addr = result.data?.getStringExtra("address").toString()
+                loc = result.data?.getStringExtra("latlong").toString()
+                binding.location.text = addr
+                loc_enabled = true
+                //if (image_enabled) {
                 binding.postButton.isEnabled = true
-            //}
-        } else {
-            binding.location.text = ""
-            binding.location.hint = "Choose Location"
-            loc_enabled = false
-            binding.postButton.isEnabled = false
+                //}
+            } else {
+                binding.location.text = ""
+                binding.location.hint = "Choose Location"
+                loc_enabled = false
+                binding.postButton.isEnabled = false
+            }
+            //Log.d("lnch2", result.data?.getStringExtra("latlong").toString())
+            //Log.d("lnch2", loc)
         }
-        //Log.d("lnch2", result.data?.getStringExtra("latlong").toString())
-        //Log.d("lnch2", loc)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -173,30 +175,32 @@ class PostActivity : AppCompatActivity() {
         }
 
         binding.postButton.setOnClickListener {
+            // Ensure imageUrl is not null before creating the post object
+            if (imageUrl != null) {
+                val post = Post(
+                    title = binding.title.editText?.text.toString(),
+                    caption = binding.caption.editText?.text.toString(),
+                    uid = Firebase.auth.currentUser!!.uid,
+                    time = System.currentTimeMillis().toString(),
+                    postUrl = imageUrl!!, // Assign the uploaded image URL to the post
+                    addr = addr,
+                    loc = loc,
+                    etype = binding.event.editText?.text.toString(),
+                )
 
-            val post: Post = Post(
-                title = binding.title.editText?.text.toString(),
-                caption = binding.caption.editText?.text.toString(),
-                uid = Firebase.auth.currentUser!!.uid,
-                time = System.currentTimeMillis().toString(),
-                addr = addr,
-                loc = loc,
-                etype = binding.event.editText?.text.toString(),
-            )
-
-            Firebase.firestore.collection(POST).document().set(post).addOnSuccessListener {
-                Firebase.firestore.collection(Firebase.auth.currentUser!!.uid).document()
-                    .set(post)
-                    .addOnSuccessListener {
-                        startActivity(Intent(this@PostActivity, HomeActivity::class.java))
-                        finish()
-                    }
-
+                // Add the post to Firestore
+                Firebase.firestore.collection(POST).document().set(post).addOnSuccessListener {
+                    Firebase.firestore.collection(Firebase.auth.currentUser!!.uid).document()
+                        .set(post)
+                        .addOnSuccessListener {
+                            startActivity(Intent(this@PostActivity, HomeActivity::class.java))
+                            finish()
+                        }
+                }
+            } else {
+                // Handle case where image URL is null
+                Toast.makeText(this, "Please upload an image first.", Toast.LENGTH_SHORT).show()
             }
-
-
-
-
         }
 
 
@@ -212,4 +216,3 @@ class PostActivity : AppCompatActivity() {
     }
 
 }
-
