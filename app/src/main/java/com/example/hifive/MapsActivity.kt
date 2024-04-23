@@ -36,7 +36,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var binding: ActivityMapsBinding
 
-    private lateinit var userLocation: String
+    private var userLocation = LatLng(0.0, 0.0).toString()
 
     //private val default = LatLng(0.0, 0.0)
 
