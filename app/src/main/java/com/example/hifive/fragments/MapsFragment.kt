@@ -35,7 +35,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
 
-    private val default = LatLng(0.0, 0.0)
+    //private val default = LatLng(0.0, 0.0)
 
     private var postList = ArrayList<Post>()
 
@@ -76,12 +76,13 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         //getLocation()
 
         mMap = googleMap
-        val loc = mapsVM.getLocation()
-        if (loc != null) {
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(loc, 15f))
-        } else {
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(default, 15f))
-        }
+//        val loc = mapsVM.getLocation()
+//        if (loc != null) {
+//            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(loc, 15f))
+//        } else {
+//            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(default, 15f))
+//        }
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mapsVM.getLocation()!!, 15f))
 
         Firebase.firestore.collection(POST).get().addOnSuccessListener {
             val tempList = ArrayList<Post>()
