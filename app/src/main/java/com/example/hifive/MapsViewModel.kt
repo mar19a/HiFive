@@ -11,13 +11,13 @@ import com.google.android.gms.maps.model.LatLng
 
 class MapsViewModel: ViewModel() {
 
-//    private var location = LatLng(0.0, 0.0)
+    private var location = LatLng(0.0, 0.0)
 //    //private lateinit var location : LatLng
 
-    private val _location = MutableLiveData<LatLng>()
-
-    private val location: LiveData<LatLng>
-        get() = _location
+//    private val _location = MutableLiveData<LatLng>()
+//
+//    private val location: LiveData<LatLng>
+//        get() = _location
 
 
 //    @SuppressLint("MissingPermission")
@@ -39,12 +39,20 @@ class MapsViewModel: ViewModel() {
 //            }
 //    }
 
+//    fun setLocation(loc: LatLng) {
+//        _location.value = loc
+//    }
+//
+//    fun getLocation(): LatLng? {
+//        return _location.value
+//    }
+
     fun setLocation(loc: LatLng) {
-        _location.value = loc
+        location = loc
     }
 
     fun getLocation(): LatLng? {
-        return _location.value
+        return location
     }
 
 
