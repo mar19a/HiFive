@@ -35,47 +35,55 @@ class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
     }
 
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
-        Firebase.firestore.collection(USER_NODE).document(postList[position].uid).get()
+        val post = postList[position]
+
+        // Load user details and handle image securely
+        Firebase.firestore.collection(USER_NODE).document(post.uid).get()
             .addOnSuccessListener { documentSnapshot ->
                 val user = documentSnapshot.toObject<User>()
-                if (user != null) {
+                if (user != null && !user.image.isNullOrEmpty()) {
                     Glide.with(context).load(user.image).placeholder(R.drawable.user)
                         .into(holder.binding.profileImage)
                     holder.binding.name.text = user.name
                 } else {
-                    // Handle the case where user data is not found
+                    holder.binding.profileImage.setImageResource(R.drawable.user) // Fallback image
                     holder.binding.name.text = "Unknown"
                 }
             }
             .addOnFailureListener { e ->
                 Log.e("PostAdapter", "Error fetching user data", e)
-
+                holder.binding.profileImage.setImageResource(R.drawable.user) // Fallback image on error
                 holder.binding.name.text = "Unknown"
             }
-        Glide.with(context).load(postList.get(position).postUrl).placeholder(R.drawable.loading)
-            .into(holder.binding.postImage)
+
+        // Validate post URL before using it
+        if (!post.postUrl.isNullOrEmpty()) {
+            Glide.with(context).load(post.postUrl).placeholder(R.drawable.loading)
+                .into(holder.binding.postImage)
+        } else {
+            holder.binding.postImage.setImageResource(R.drawable.loading) // Fallback image if URL is empty
+        }
+
+        // Handling other bindings and user interactions
         try {
-            val text = TimeAgo.using(postList.get(position).time.toLong())
-
+            val text = TimeAgo.using(post.time.toLong())
             holder.binding.time.text = text
-
         } catch (e: Exception) {
             holder.binding.time.text = ""
             Log.e("PostAdapter", "Error formatting time", e)
         }
 
         holder.binding.share.setOnClickListener {
-            var i = Intent(Intent.ACTION_SEND)
-            i.type = "text/plain"
-            i.putExtra(Intent.EXTRA_TEXT, postList.get(position).postUrl)
-            context.startActivity(i)
-
+            val intent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, post.postUrl)
+            }
+            context.startActivity(intent)
         }
-        holder.binding.csption.text = postList.get(position).caption
+
+        holder.binding.csption.text = post.caption
         holder.binding.like.setOnClickListener {
             holder.binding.like.setImageResource(R.drawable.heart_like)
         }
-
-
     }
 }

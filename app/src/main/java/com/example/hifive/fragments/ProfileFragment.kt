@@ -13,6 +13,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.example.hifive.Models.User
+import com.example.hifive.R
 import com.example.hifive.SignUpActivity
 import com.example.hifive.adapters.ViewPagerAdapter
 import com.example.hifive.databinding.FragmentProfileBinding
@@ -72,23 +73,30 @@ class ProfileFragment : Fragment() {
         super.onStart()
         val userId = Firebase.auth.currentUser?.uid
         if (userId != null) {
-        Firebase.firestore.collection(USER_NODE).document(userId).get()
-            .addOnSuccessListener { documentSnapshot ->
-                val user = documentSnapshot.toObject<User>()
-                if (user != null) {
-                    binding.name.text = user.name ?: ""
-                    binding.bio.text = user.email ?: ""
-                    if (!user.image.isNullOrEmpty()) {
-                        Picasso.get().load(user.image).into(binding.profileImage)
+            Firebase.firestore.collection(USER_NODE).document(userId).get()
+                .addOnSuccessListener { documentSnapshot ->
+                    val user = documentSnapshot.toObject<User>()
+                    if (user != null) {
+                        binding.name.text = user.name ?: ""
+                        binding.bio.text = user.email ?: ""
+                        // Check if the image URL is not null and not empty
+                        if (!user.image.isNullOrEmpty()) {
+                            Picasso.get().load(user.image)
+                                .placeholder(R.drawable.user)  // Default or fallback image
+                                .into(binding.profileImage)
+                        } else {
+                            // Set default image if there is no URL
+                            binding.profileImage.setImageResource(R.drawable.user)
+                        }
+                    } else {
+                        handleUserDataNotFound()
                     }
-                } else {
-                    handleUserDataNotFound()
                 }
-            }
-    } else{
+        } else{
             handleUserNotLoggedIn()
+        }
     }
-    }
+
 
     private fun handleUserDataNotFound() {
         Toast.makeText(
