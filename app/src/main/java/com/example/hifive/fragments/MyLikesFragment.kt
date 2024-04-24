@@ -25,6 +25,10 @@ class MyLikesFragment : Fragment() {
     private lateinit var adapter: PostAdapter
     private var postList = ArrayList<Post>()
 
+    override fun onResume() {
+        super.onResume()
+        loadLikedPosts()  // Refresh the list of liked posts
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
