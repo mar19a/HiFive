@@ -2,9 +2,11 @@ package com.example.hifive.adapters
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.github.marlonlom.utilities.timeago.TimeAgo
@@ -61,6 +63,10 @@ class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
         holder.binding.like.setOnClickListener {
             toggleLike(post, holder)
         }
+
+        holder.binding.imageView8.setOnClickListener {
+            openGoogleMapsForDirections(post.eventLoc)
+        }
     }
 
     private fun checkLikeStatus(post: Post, holder: MyHolder) {
@@ -89,9 +95,19 @@ class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
         }.addOnSuccessListener {
             Log.d("PostAdapter", "Like status toggled.")
             holder.binding.like.setImageResource(if (post.isLikedByCurrentUser) R.drawable.heart_like else R.drawable.heart)
-            // Refresh data if needed
         }.addOnFailureListener { e ->
             Log.e("PostAdapter", "Failed to toggle like status.", e)
+        }
+    }
+
+    private fun openGoogleMapsForDirections(eventLoc: String) {
+        val gmmIntentUri = Uri.parse("google.navigation:q=$eventLoc")
+        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+        mapIntent.setPackage("com.google.android.apps.maps")
+        if (mapIntent.resolveActivity(context.packageManager) != null) {
+            context.startActivity(mapIntent)
+        } else {
+            Toast.makeText(context, "Google Maps is not installed", Toast.LENGTH_SHORT).show()
         }
     }
 }
