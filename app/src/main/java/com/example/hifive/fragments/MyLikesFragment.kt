@@ -24,19 +24,19 @@ class MyLikesFragment : Fragment() {
     private lateinit var binding: FragmentMyReelsBinding
     private lateinit var adapter: PostAdapter
     private var postList = ArrayList<Post>()
+    private var seenPostIds = HashSet<String>()  // Set to track seen posts
 
     override fun onResume() {
         super.onResume()
         loadLikedPosts()  // Refresh the list of liked posts
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentMyReelsBinding.inflate(inflater, container, false)
         adapter = PostAdapter(requireContext(), postList)
         binding.rv.layoutManager = LinearLayoutManager(requireContext())
@@ -50,22 +50,39 @@ class MyLikesFragment : Fragment() {
     private fun loadLikedPosts() {
         val userId = Firebase.auth.currentUser?.uid
         if (userId != null) {
-            Firebase.firestore.collection("posts")
-                .whereEqualTo("isLikedByCurrentUser", true)
+            Firebase.firestore.collection("userLikes").document(userId).collection("likes")
                 .get().addOnSuccessListener { documents ->
-                    postList.clear()
-                    for (document in documents) {
-                        val post = document.toObject(Post::class.java)
-                        postList.add(post)
-                    }
-                    adapter.notifyDataSetChanged()
+                    val postIds = documents.map { it.id }
+                    fetchPostsByIds(postIds)
                 }
                 .addOnFailureListener { e ->
                     Log.e("MyLikesFragment", "Error loading liked posts", e)
                 }
+        } else {
+            postList.clear()
+            adapter.notifyDataSetChanged()
+            seenPostIds.clear()  // Clear seen posts if user logs out
         }
     }
 
+    private fun fetchPostsByIds(postIds: List<String>) {
+        postList.clear()
+        seenPostIds.clear()  // Reset seen posts for a fresh start
+        postIds.forEach { postId ->
+            if (!seenPostIds.contains(postId)) {  // Check if post ID has already been handled
+                Firebase.firestore.collection("posts").document(postId).get()
+                    .addOnSuccessListener { documentSnapshot ->
+                        val post = documentSnapshot.toObject(Post::class.java)
+                        post?.let {
+                            if (seenPostIds.add(postId)) {  // Add to seen set and check if it was truly added
+                                postList.add(it)
+                                adapter.notifyDataSetChanged()
+                            }
+                        }
+                    }
+            }
+        }
+    }
 
     companion object {
         fun newInstance(): MyLikesFragment {

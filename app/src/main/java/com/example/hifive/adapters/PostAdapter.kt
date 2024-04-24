@@ -34,7 +34,6 @@ class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
         val post = postList[position]
 
-        // Load user details
         Firebase.firestore.collection(USER_NODE).document(post.uid).get()
             .addOnSuccessListener { documentSnapshot ->
                 val user = documentSnapshot.toObject<User>()
@@ -53,12 +52,10 @@ class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
                 holder.binding.name.text = "Unknown"
             }
 
-        // Load post image
         Glide.with(context).load(post.postUrl).placeholder(R.drawable.loading).into(holder.binding.postImage)
         holder.binding.time.text = TimeAgo.using(post.time.toLong())
         holder.binding.csption.text = post.caption
 
-        // Set up like button
         checkLikeStatus(post, holder)
 
         holder.binding.like.setOnClickListener {
@@ -68,42 +65,33 @@ class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
 
     private fun checkLikeStatus(post: Post, holder: MyHolder) {
         val userId = Firebase.auth.currentUser?.uid ?: return
-        Firebase.firestore.collection("posts").document(post.postId).collection("likes")
-            .document(userId).get()
+        Firebase.firestore.collection("userLikes").document(userId).collection("likes")
+            .document(post.postId).get()
             .addOnSuccessListener { documentSnapshot ->
                 post.isLikedByCurrentUser = documentSnapshot.exists()
                 holder.binding.like.setImageResource(if (post.isLikedByCurrentUser) R.drawable.heart_like else R.drawable.heart)
             }
     }
 
-    private fun updateLikeButton(holder: MyHolder, post: Post) {
-        holder.binding.like.setImageResource(if (post.isLikedByCurrentUser) R.drawable.heart_like else R.drawable.heart)
-    }
-
     private fun toggleLike(post: Post, holder: MyHolder) {
         val userId = Firebase.auth.currentUser?.uid ?: return
-        val postRef = Firebase.firestore.collection("posts").document(post.postId)
-        val likeRef = postRef.collection("likes").document(userId)
+        val likeRef = Firebase.firestore.collection("userLikes").document(userId).collection("likes").document(post.postId)
 
         Firebase.firestore.runTransaction { transaction ->
             val snapshot = transaction.get(likeRef)
             if (snapshot.exists()) {
                 transaction.delete(likeRef)
-                post.isLikedByCurrentUser = false // Update the local model
+                post.isLikedByCurrentUser = false
             } else {
                 transaction.set(likeRef, hashMapOf("timestamp" to System.currentTimeMillis()))
-                post.isLikedByCurrentUser = true // Update the local model
+                post.isLikedByCurrentUser = true
             }
         }.addOnSuccessListener {
             Log.d("PostAdapter", "Like status toggled.")
-            // Update Firestore post document with the new like status
-            postRef.update("isLikedByCurrentUser", post.isLikedByCurrentUser)
             holder.binding.like.setImageResource(if (post.isLikedByCurrentUser) R.drawable.heart_like else R.drawable.heart)
-        }.addOnFailureListener {
-            Log.e("PostAdapter", "Failed to toggle like status.", it)
+            // Refresh data if needed
+        }.addOnFailureListener { e ->
+            Log.e("PostAdapter", "Failed to toggle like status.", e)
         }
     }
-
-
 }
-
