@@ -23,6 +23,8 @@ import com.example.hifive.adapters.PostAdapter
 import com.example.hifive.databinding.FragmentHomeBinding
 import com.example.hifive.utils.FOLLOW
 import com.example.hifive.utils.POST
+import com.example.hifive.utils.USER_NODE
+import com.squareup.picasso.Picasso
 
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
@@ -35,7 +37,10 @@ class HomeFragment : Fragment() {
         super.onCreate(savedInstanceState)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         adapter = PostAdapter(requireContext(), postList)
         binding.postRv.layoutManager = LinearLayoutManager(requireContext())
@@ -49,17 +54,36 @@ class HomeFragment : Fragment() {
 
         loadFollows()
         loadPosts()
+        loadProfileImage()
 
         return binding.root
     }
 
     override fun onResume() {
         super.onResume()
-        loadPosts()
+        loadProfileImage()
+    }
+
+    private fun loadProfileImage() {
+        val userId = Firebase.auth.currentUser?.uid
+        if (userId != null) {
+            Firebase.firestore.collection(USER_NODE).document(userId).get()
+                .addOnSuccessListener { documentSnapshot ->
+                    val user = documentSnapshot.toObject<User>()
+                    if (user != null && !user.image.isNullOrEmpty()) {
+                        Picasso.get().load(user.image).placeholder(R.drawable.user).into(binding.imageView3)
+                    } else {
+                        binding.imageView3.setImageResource(R.drawable.user)
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.e("HomeFragment", "Error loading profile image", e)
+                }
+        }
     }
 
     private fun loadPosts() {
-        Firebase.firestore.collection("posts").get() // Changed to correct collection name
+        Firebase.firestore.collection("posts").get()
             .addOnSuccessListener { documents ->
                 val tempList = ArrayList<Post>()
                 postList.clear()
@@ -100,6 +124,8 @@ class HomeFragment : Fragment() {
     }
 
     companion object {
-
+        fun newInstance(): HomeFragment {
+            return HomeFragment()
+        }
     }
 }
