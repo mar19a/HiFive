@@ -177,7 +177,11 @@ class PostActivity : AppCompatActivity() {
         binding.postButton.setOnClickListener {
             // Ensure imageUrl is not null before creating the post object
             if (imageUrl != null) {
+                // Create a new document reference with a unique ID
+                val newPostRef = Firebase.firestore.collection("posts").document()
+
                 val post = Post(
+                    postId = newPostRef.id, // Use the generated document ID
                     title = binding.title.editText?.text.toString(),
                     caption = binding.caption.editText?.text.toString(),
                     uid = Firebase.auth.currentUser!!.uid,
@@ -185,17 +189,20 @@ class PostActivity : AppCompatActivity() {
                     postUrl = imageUrl!!, // Assign the uploaded image URL to the post
                     addr = addr,
                     loc = loc,
-                    etype = binding.event.editText?.text.toString(),
+                    etype = binding.event.editText?.text.toString()
                 )
 
-                // Add the post to Firestore
-                Firebase.firestore.collection(POST).document().set(post).addOnSuccessListener {
-                    Firebase.firestore.collection(Firebase.auth.currentUser!!.uid).document()
+                // Set the post object to the new document
+                newPostRef.set(post).addOnSuccessListener {
+                    Firebase.firestore.collection(Firebase.auth.currentUser!!.uid).document(newPostRef.id)
                         .set(post)
                         .addOnSuccessListener {
                             startActivity(Intent(this@PostActivity, HomeActivity::class.java))
                             finish()
                         }
+                }.addOnFailureListener {
+                    // Handle case where the Firestore operation fails
+                    Toast.makeText(this, "Failed to create post. Please try again.", Toast.LENGTH_SHORT).show()
                 }
             } else {
                 // Handle case where image URL is null

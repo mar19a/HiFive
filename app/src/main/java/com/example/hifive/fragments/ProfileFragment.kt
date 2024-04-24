@@ -27,13 +27,9 @@ class ProfileFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentProfileBinding.inflate(inflater, container, false)
         binding.editProfile.setOnClickListener {
             val intent = Intent(activity, SignUpActivity::class.java)
@@ -48,6 +44,7 @@ class ProfileFragment : Fragment() {
 
         return binding.root
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupViewPager()
@@ -56,23 +53,18 @@ class ProfileFragment : Fragment() {
     private fun setupViewPager() {
         viewPagerAdapter = ViewPagerAdapter(childFragmentManager)
         viewPagerAdapter.addFragments(MyPostFragment(), "My Post")
-        viewPagerAdapter.addFragments(MyReelsFragment(), "My Reels")
+        viewPagerAdapter.addFragments(MyLikesFragment(), "My Likes") // Assuming you rename or repurpose MyReelsFragment
         binding.viewPager.adapter = viewPagerAdapter
         binding.tabLayout.setupWithViewPager(binding.viewPager)
     }
 
     private fun logoutUser() {
-        Firebase.auth.signOut() // Log out from Firebase
-
+        Firebase.auth.signOut()
         val intent = Intent(activity, LoginActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         startActivity(intent)
-        activity?.finish() // Ensure the user cannot navigate back to the ProfileFragment without logging in again.
-    }
-
-    companion object {
-
+        activity?.finish()
     }
 
     override fun onStart() {
@@ -90,9 +82,7 @@ class ProfileFragment : Fragment() {
                         binding.name.text = user.name ?: ""
                         binding.bio.text = user.email ?: ""
                         if (!user.image.isNullOrEmpty()) {
-                            Picasso.get().load(user.image)
-                                .placeholder(R.drawable.user)
-                                .into(binding.profileImage)
+                            Picasso.get().load(user.image).placeholder(R.drawable.user).into(binding.profileImage)
                         } else {
                             binding.profileImage.setImageResource(R.drawable.user)
                         }
@@ -105,7 +95,6 @@ class ProfileFragment : Fragment() {
         }
     }
 
-
     private fun handleUserDataNotFound() {
         Toast.makeText(context, "User data not found. Please complete your profile.", Toast.LENGTH_LONG).show()
         val intent = Intent(activity, SignUpActivity::class.java).apply {
@@ -115,7 +104,6 @@ class ProfileFragment : Fragment() {
         activity?.startActivity(intent) ?: Toast.makeText(context, "Error starting activity. Please try again later.", Toast.LENGTH_SHORT).show()
     }
 
-
     private fun handleUserNotLoggedIn() {
         Toast.makeText(context, "You must be logged in to view this page. Redirecting to login...", Toast.LENGTH_LONG).show()
         val intent = Intent(activity, LoginActivity::class.java).apply {
@@ -123,6 +111,4 @@ class ProfileFragment : Fragment() {
         }
         activity?.startActivity(intent) ?: Toast.makeText(context, "Error starting activity. Please try again later.", Toast.LENGTH_SHORT).show()
     }
-
-
-    }
+}

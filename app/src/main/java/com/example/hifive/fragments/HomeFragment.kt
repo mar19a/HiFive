@@ -30,63 +30,68 @@ class HomeFragment : Fragment() {
     private lateinit var adapter: PostAdapter
     private var followList = ArrayList<User>()
     private lateinit var followAdapter: FollowAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         adapter = PostAdapter(requireContext(), postList)
         binding.postRv.layoutManager = LinearLayoutManager(requireContext())
         binding.postRv.adapter = adapter
 
         followAdapter = FollowAdapter(requireContext(), followList)
-        binding.followRv.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-
+        binding.followRv.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.followRv.adapter = followAdapter
         setHasOptionsMenu(true)
         (requireActivity() as AppCompatActivity).setSupportActionBar(binding.materialToolbar2)
 
-        Firebase.firestore.collection(Firebase.auth.currentUser!!.uid + FOLLOW).get()
-            .addOnSuccessListener {
-                var tempList=ArrayList<User>()
-                followList.clear()
-                for(i in it.documents){
-                    var user:User=i.toObject<User>()!!
-                    tempList.add(user)
-                }
-                followList.addAll(tempList)
-                followAdapter.notifyDataSetChanged()
-
-            }
-
-
-        Firebase.firestore.collection(POST).get().addOnSuccessListener {
-            var tempList = ArrayList<Post>()
-            postList.clear()
-            for (i in it.documents) {
-
-                var post: Post = i.toObject<Post>()!!
-                tempList.add(post)
-            }
-            postList.addAll(tempList)
-            Log.d("HomeFragment", postList.size.toString())
-            adapter.notifyDataSetChanged()
-        }
-
-
+        loadFollows()
+        loadPosts()
 
         return binding.root
     }
 
-    companion object {
+    override fun onResume() {
+        super.onResume()
+        loadPosts()
+    }
 
+    private fun loadPosts() {
+        Firebase.firestore.collection("posts").get() // Changed to correct collection name
+            .addOnSuccessListener { documents ->
+                val tempList = ArrayList<Post>()
+                postList.clear()
+                for (document in documents) {
+                    document.toObject<Post>()?.let {
+                        tempList.add(it)
+                    }
+                }
+                postList.addAll(tempList)
+                adapter.notifyDataSetChanged()
+            }
+            .addOnFailureListener { exception ->
+                Log.e("HomeFragment", "Error loading posts: ", exception)
+            }
+    }
+
+    private fun loadFollows() {
+        Firebase.firestore.collection(Firebase.auth.currentUser!!.uid + FOLLOW).get()
+            .addOnSuccessListener { documents ->
+                val tempList = ArrayList<User>()
+                followList.clear()
+                for (document in documents) {
+                    document.toObject<User>()?.let {
+                        tempList.add(it)
+                    }
+                }
+                followList.addAll(tempList)
+                followAdapter.notifyDataSetChanged()
+            }
+            .addOnFailureListener { exception ->
+                Log.e("HomeFragment", "Error loading follows: ", exception)
+            }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -94,4 +99,7 @@ class HomeFragment : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
+    companion object {
+
+    }
 }
