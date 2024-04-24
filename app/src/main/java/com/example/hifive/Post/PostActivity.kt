@@ -178,7 +178,7 @@ class PostActivity : AppCompatActivity() {
             // Ensure imageUrl is not null before creating the post object
             if (imageUrl != null) {
                 // Create a new document reference with a unique ID
-                val newPostRef = Firebase.firestore.collection("Post").document()
+                val newPostRef = Firebase.firestore.collection("posts").document()
 
                 val post = Post(
                     postId = newPostRef.id, // Use the generated document ID
