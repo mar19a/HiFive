@@ -35,10 +35,9 @@ class ProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentProfileBinding.inflate(inflater, container, false)
-
         binding.editProfile.setOnClickListener {
-            val intent=Intent(activity,SignUpActivity::class.java)
-            intent.putExtra("MODE",1)
+            val intent = Intent(activity, SignUpActivity::class.java)
+            intent.putExtra("MODE", 1)
             activity?.startActivity(intent)
             activity?.finish()
         }
@@ -46,13 +45,20 @@ class ProfileFragment : Fragment() {
         binding.logoutButton.setOnClickListener {
             logoutUser()
         }
-        viewPagerAdapter=ViewPagerAdapter(requireActivity().supportFragmentManager)
-        viewPagerAdapter.addFragments(MyPostFragment(),"My Post")
-        viewPagerAdapter.addFragments(MyReelsFragment(),"My Reels")
-        binding.viewPager.adapter=viewPagerAdapter
-        binding.tabLayout.setupWithViewPager(binding.viewPager)
 
         return binding.root
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupViewPager()
+    }
+
+    private fun setupViewPager() {
+        viewPagerAdapter = ViewPagerAdapter(childFragmentManager)
+        viewPagerAdapter.addFragments(MyPostFragment(), "My Post")
+        viewPagerAdapter.addFragments(MyReelsFragment(), "My Reels")
+        binding.viewPager.adapter = viewPagerAdapter
+        binding.tabLayout.setupWithViewPager(binding.viewPager)
     }
 
     private fun logoutUser() {
@@ -71,6 +77,10 @@ class ProfileFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+        updateUserProfile()
+    }
+
+    private fun updateUserProfile() {
         val userId = Firebase.auth.currentUser?.uid
         if (userId != null) {
             Firebase.firestore.collection(USER_NODE).document(userId).get()
@@ -79,51 +89,38 @@ class ProfileFragment : Fragment() {
                     if (user != null) {
                         binding.name.text = user.name ?: ""
                         binding.bio.text = user.email ?: ""
-                        // Check if the image URL is not null and not empty
                         if (!user.image.isNullOrEmpty()) {
                             Picasso.get().load(user.image)
-                                .placeholder(R.drawable.user)  // Default or fallback image
+                                .placeholder(R.drawable.user)
                                 .into(binding.profileImage)
                         } else {
-                            // Set default image if there is no URL
                             binding.profileImage.setImageResource(R.drawable.user)
                         }
                     } else {
                         handleUserDataNotFound()
                     }
                 }
-        } else{
+        } else {
             handleUserNotLoggedIn()
         }
     }
 
 
     private fun handleUserDataNotFound() {
-        Toast.makeText(
-            context,
-            "User data not found. Please complete your profile.",
-            Toast.LENGTH_LONG
-        ).show()
-
-
+        Toast.makeText(context, "User data not found. Please complete your profile.", Toast.LENGTH_LONG).show()
         val intent = Intent(activity, SignUpActivity::class.java).apply {
             putExtra("MODE", 1)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
-
         activity?.startActivity(intent) ?: Toast.makeText(context, "Error starting activity. Please try again later.", Toast.LENGTH_SHORT).show()
     }
 
 
     private fun handleUserNotLoggedIn() {
         Toast.makeText(context, "You must be logged in to view this page. Redirecting to login...", Toast.LENGTH_LONG).show()
-
-
         val intent = Intent(activity, LoginActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
-
-
         activity?.startActivity(intent) ?: Toast.makeText(context, "Error starting activity. Please try again later.", Toast.LENGTH_SHORT).show()
     }
 
