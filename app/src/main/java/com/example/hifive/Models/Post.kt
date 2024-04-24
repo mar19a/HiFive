@@ -14,7 +14,7 @@ class Post {
     var eventLoc:String=""
     var eventDate:String=""
     var eventTime:String=""
-    var isLiked: Boolean = false
+    var isLikedByCurrentUser: Boolean = false
 
 
     constructor()

@@ -71,13 +71,13 @@ class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
         Firebase.firestore.collection("posts").document(post.postId).collection("likes")
             .document(userId).get()
             .addOnSuccessListener { documentSnapshot ->
-                post.isLiked = documentSnapshot.exists()
-                holder.binding.like.setImageResource(if (post.isLiked) R.drawable.heart_like else R.drawable.heart)
+                post.isLikedByCurrentUser = documentSnapshot.exists()
+                holder.binding.like.setImageResource(if (post.isLikedByCurrentUser) R.drawable.heart_like else R.drawable.heart)
             }
     }
 
     private fun updateLikeButton(holder: MyHolder, post: Post) {
-        holder.binding.like.setImageResource(if (post.isLiked) R.drawable.heart_like else R.drawable.heart)
+        holder.binding.like.setImageResource(if (post.isLikedByCurrentUser) R.drawable.heart_like else R.drawable.heart)
     }
 
     private fun toggleLike(post: Post, holder: MyHolder) {
@@ -89,18 +89,21 @@ class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
             val snapshot = transaction.get(likeRef)
             if (snapshot.exists()) {
                 transaction.delete(likeRef)
-                post.isLiked = false
+                post.isLikedByCurrentUser = false // Update the local model
             } else {
                 transaction.set(likeRef, hashMapOf("timestamp" to System.currentTimeMillis()))
-                post.isLiked = true
+                post.isLikedByCurrentUser = true // Update the local model
             }
         }.addOnSuccessListener {
             Log.d("PostAdapter", "Like status toggled.")
-            holder.binding.like.setImageResource(if (post.isLiked) R.drawable.heart_like else R.drawable.heart)
+            // Update Firestore post document with the new like status
+            postRef.update("isLikedByCurrentUser", post.isLikedByCurrentUser)
+            holder.binding.like.setImageResource(if (post.isLikedByCurrentUser) R.drawable.heart_like else R.drawable.heart)
         }.addOnFailureListener {
             Log.e("PostAdapter", "Failed to toggle like status.", it)
         }
     }
+
 
 }
 

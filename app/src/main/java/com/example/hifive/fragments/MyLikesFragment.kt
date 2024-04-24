@@ -33,7 +33,6 @@ class MyLikesFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         binding = FragmentMyReelsBinding.inflate(inflater, container, false)
         adapter = PostAdapter(requireContext(), postList)
         binding.rv.layoutManager = LinearLayoutManager(requireContext())
@@ -47,7 +46,8 @@ class MyLikesFragment : Fragment() {
     private fun loadLikedPosts() {
         val userId = Firebase.auth.currentUser?.uid
         if (userId != null) {
-            Firebase.firestore.collection("posts").whereArrayContains("likes", userId)
+            Firebase.firestore.collection("posts")
+                .whereEqualTo("isLikedByCurrentUser", true)
                 .get().addOnSuccessListener { documents ->
                     postList.clear()
                     for (document in documents) {
@@ -61,6 +61,7 @@ class MyLikesFragment : Fragment() {
                 }
         }
     }
+
 
     companion object {
         fun newInstance(): MyLikesFragment {
