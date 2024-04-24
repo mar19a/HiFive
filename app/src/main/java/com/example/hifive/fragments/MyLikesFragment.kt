@@ -24,11 +24,11 @@ class MyLikesFragment : Fragment() {
     private lateinit var binding: FragmentMyReelsBinding
     private lateinit var adapter: PostAdapter
     private var postList = ArrayList<Post>()
-    private var seenPostIds = HashSet<String>()  // Set to track seen posts
+    private var seenPostIds = HashSet<String>()
 
     override fun onResume() {
         super.onResume()
-        loadLikedPosts()  // Refresh the list of liked posts
+        loadLikedPosts()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,15 +61,15 @@ class MyLikesFragment : Fragment() {
         } else {
             postList.clear()
             adapter.notifyDataSetChanged()
-            seenPostIds.clear()  // Clear seen posts if user logs out
+            seenPostIds.clear()
         }
     }
 
     private fun fetchPostsByIds(postIds: List<String>) {
         postList.clear()
-        seenPostIds.clear()  // Reset seen posts for a fresh start
+        seenPostIds.clear()
         postIds.forEach { postId ->
-            if (!seenPostIds.contains(postId)) {  // Check if post ID has already been handled
+            if (!seenPostIds.contains(postId)) {
                 Firebase.firestore.collection("posts").document(postId).get()
                     .addOnSuccessListener { documentSnapshot ->
                         val post = documentSnapshot.toObject(Post::class.java)

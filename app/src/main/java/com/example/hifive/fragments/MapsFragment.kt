@@ -84,7 +84,8 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 //        }
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mapsVM.getLocation()!!, 15f))
 
-        Firebase.firestore.collection(POST).get().addOnSuccessListener {
+
+        Firebase.firestore.collection("posts").get().addOnSuccessListener {
             val tempList = ArrayList<Post>()
             postList.clear()
             for ((index,i) in it.documents.withIndex()) {
