@@ -5,6 +5,7 @@ import android.Manifest
 import android.animation.Animator
 import android.os.Bundle
 import android.os.Build
+import android.util.Log
 import com.google.android.gms.nearby.connection.Payload
 import com.google.android.gms.nearby.connection.ConnectionInfo
 import kotlin.random.Random
@@ -14,10 +15,17 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.hifive.Models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 import com.example.hifive.adapters.SearchAdapter
+import com.example.hifive.utils.USER_NODE
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.ktx.Firebase
 
 
 class AddUserActivity : ConnectionsActivity() {
@@ -33,6 +41,7 @@ class AddUserActivity : ConnectionsActivity() {
 
     private lateinit var adapter : SearchAdapter
     private var userList = ArrayList<User>()
+    private lateinit var rv : RecyclerView
 
     private lateinit var addUserText : TextView
     private lateinit var userIDText : TextView
@@ -46,25 +55,38 @@ class AddUserActivity : ConnectionsActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_add_user)
 
         //DEBUG Temporary User ID Generation
-        myName = getRandomString(8)
+        //myName = getRandomString(8)
+
         addUserText = findViewById(R.id.addUserDialog)
         userIDText = findViewById(R.id.debugUserID)
-        userIDText.text = "ID: " + myName
+
         connectedIDText = findViewById(R.id.debugConnectedID)
         qrFrame = findViewById(R.id.testQr)
+
+        UUID = FirebaseAuth.getInstance().currentUser!!.uid
+        myName = UUID
+
         Picasso.get().load("https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="+myName).into(qrFrame)
+
+
+        //Debug TextView (To remove)
+        userIDText.text = "UUID: " + myName
 
         sendIdButton = findViewById(R.id.sendIDButton)
         sendIdButton.setOnClickListener{
-            send(Payload.fromBytes(myName.toByteArray(Charsets.UTF_8)))
+            Log.d("Check UUID", UUID)
+            send(Payload.fromBytes(UUID.toByteArray(Charsets.UTF_8)))
+
         }
 
         adapter = SearchAdapter(applicationContext, userList)
-        UUID = FirebaseAuth.getInstance().currentUser!!.uid
-
+        rv = findViewById(R.id.recyclerView)
+        rv.layoutManager = LinearLayoutManager(applicationContext)
+        rv.adapter = adapter
     }
 
     private fun getRandomString(length: Int) : String {
@@ -154,12 +176,39 @@ class AddUserActivity : ConnectionsActivity() {
     }
 
     override fun onReceive(endpoint: Endpoint?, payload: Payload?) {
-        if (payload!!.type == Payload.Type.BYTES){
-            connectedIDText.text = payload.asBytes().toString()
+        if (payload!!.type == Payload.Type.BYTES) {
+            connectedIDText.text = payload.asBytes()!!.toString(Charsets.UTF_8)
             //TODO: Parse Bytes Here And Display Follow RV for User
+            Firebase.firestore.collection(USER_NODE).get().addOnSuccessListener {
+                //Debug Statement
+                //Log.d("firebase debug", "payload received, OnSuccess called")
+                Log.d("firebase debug", "Payload:" + payload.asBytes()!!.toString(Charsets.UTF_8))
+
+                var tempList = ArrayList<User>()
+                userList.clear()
+                for (i in it.documents) {
+
+                    if (i.id == Firebase.auth.currentUser!!.uid) {
+
+                    } else {
+                        Log.d("iterated user id", i.id)
+
+                        if (connectedIDText.text == i.id) {
+                            //Check if payload is ever caught
+                            Log.d("debug query", "test query matched")
+                            var user: User = i.toObject<User>()!!
+
+                            tempList.add(user)
+                        }
+                    }
+
+                }
+
+                userList.addAll(tempList)
+                adapter.notifyDataSetChanged()
+            }
         }
     }
-
 
 
 

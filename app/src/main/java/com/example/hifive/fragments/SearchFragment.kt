@@ -17,6 +17,7 @@ import com.example.hifive.adapters.SearchAdapter
 import com.example.hifive.databinding.FragmentSearchBinding
 import com.example.hifive.utils.FOLLOW
 import com.example.hifive.utils.USER_NODE
+import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 
 
@@ -43,6 +44,7 @@ class SearchFragment : Fragment() {
         //Handler For Add Users Button
         binding.addUsersButton.setOnClickListener {
             val intent = Intent(context, AddUserActivity::class.java)
+            intent.putExtra("LOGGED_IN_USER", FirebaseAuth.getInstance().currentUser!!.uid)
             startActivity(intent)
         }
 
