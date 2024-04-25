@@ -4,36 +4,54 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
     app:startDestination="@id/home">
+
     <fragment
         android:id="@+id/home"
         android:name="com.example.hifive.fragments.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" />
+
     <fragment
         android:id="@+id/search"
         android:name="com.example.hifive.fragments.SearchFragment"
         android:label="fragment_search"
         tools:layout="@layout/fragment_search" />
+
     <dialog
         android:id="@+id/add"
         android:name="com.example.hifive.fragments.AddFragment"
         android:label="fragment_add"
         tools:layout="@layout/fragment_add" />
+
     <fragment
         android:id="@+id/maps"
         android:name="com.example.hifive.fragments.MapsFragment"
         android:label="fragment_maps"
         tools:layout="@layout/fragment_maps" />
+
     <fragment
         android:id="@+id/profile"
         android:name="com.example.hifive.fragments.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" />
+
     <fragment
         android:id="@+id/messageFragment"
         android:name="com.example.hifive.fragments.MessageFragment"
         android:label="Messages"
         tools:layout="@layout/fragment_message" />
+
+    <fragment
+        android:id="@+id/chatRoomFragment"
+        android:name="com.example.hifive.fragments.ChatRoomFragment"
+        android:label="Chat Room"
+        tools:layout="@layout/fragment_chat_room">
+    </fragment>
+
+    <action
+        android:id="@+id/action_messageFragment_to_chatRoomFragment"
+        app:destination="@id/chatRoomFragment" />
+
     <action
         android:id="@+id/action_homeFragment_to_messageFragment"
         app:destination="@id/messageFragment" />
