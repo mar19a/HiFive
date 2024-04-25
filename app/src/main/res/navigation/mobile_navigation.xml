@@ -29,4 +29,12 @@
         android:name="com.example.hifive.fragments.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" />
+    <fragment
+        android:id="@+id/messageFragment"
+        android:name="com.example.hifive.fragments.MessageFragment"
+        android:label="Messages"
+        tools:layout="@layout/fragment_message" />
+    <action
+        android:id="@+id/action_homeFragment_to_messageFragment"
+        app:destination="@id/messageFragment" />
 </navigation>
