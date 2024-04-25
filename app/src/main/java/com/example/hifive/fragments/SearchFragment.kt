@@ -15,6 +15,7 @@ import com.google.firebase.ktx.Firebase
 import com.example.hifive.Models.User
 import com.example.hifive.adapters.SearchAdapter
 import com.example.hifive.databinding.FragmentSearchBinding
+import com.example.hifive.utils.FOLLOW
 import com.example.hifive.utils.USER_NODE
 import com.squareup.picasso.Picasso
 
@@ -45,7 +46,7 @@ class SearchFragment : Fragment() {
             startActivity(intent)
         }
 
-        Firebase.firestore.collection(USER_NODE).get().addOnSuccessListener {
+        /*Firebase.firestore.collection(USER_NODE).get().addOnSuccessListener {
 
             var tempList = ArrayList<User>()
             userList.clear()
@@ -65,6 +66,21 @@ class SearchFragment : Fragment() {
 
 
         }
+        */
+
+        //Only show users you are already following
+        Firebase.firestore.collection(Firebase.auth.currentUser!!.uid + FOLLOW).get()
+            .addOnSuccessListener {
+                var tempList=ArrayList<User>()
+                userList.clear()
+                for(i in it.documents){
+                    var user:User=i.toObject<User>()!!
+                    tempList.add(user)
+                }
+                userList.addAll(tempList)
+                adapter.notifyDataSetChanged()
+
+            }
 
         binding.searchButton.setOnClickListener {
             var text=binding.searchView.text.toString()

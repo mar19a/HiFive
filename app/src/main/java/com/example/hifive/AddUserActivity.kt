@@ -14,6 +14,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 
 
@@ -31,6 +32,8 @@ class AddUserActivity : ConnectionsActivity() {
     private lateinit var addUserText : TextView
     private lateinit var userIDText : TextView
     private lateinit var connectedIDText : TextView
+
+    private lateinit var UUID : String
 
     private lateinit var qrFrame : ImageView
 
@@ -53,6 +56,9 @@ class AddUserActivity : ConnectionsActivity() {
         sendIdButton.setOnClickListener{
             send(Payload.fromBytes(myName.toByteArray(Charsets.UTF_8)))
         }
+
+        UUID = FirebaseAuth.getInstance().currentUser!!.uid
+
     }
 
     private fun getRandomString(length: Int) : String {

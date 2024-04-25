@@ -77,7 +77,7 @@ dependencies {
 
     implementation ("com.github.bumptech.glide:glide:4.15.1")
 
-    implementation( libs.timeago)
+    implementation(libs.timeago)
 
     implementation("com.google.android.gms:play-services-maps:18.2.0")
 }
