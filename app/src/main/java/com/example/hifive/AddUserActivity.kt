@@ -14,8 +14,10 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.example.hifive.Models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
+import com.example.hifive.adapters.SearchAdapter
 
 
 class AddUserActivity : ConnectionsActivity() {
@@ -28,6 +30,9 @@ class AddUserActivity : ConnectionsActivity() {
     private var myName = "get user's name and put it here"
 
     private var mState = State.UNKNOWN
+
+    private lateinit var adapter : SearchAdapter
+    private var userList = ArrayList<User>()
 
     private lateinit var addUserText : TextView
     private lateinit var userIDText : TextView
@@ -57,6 +62,7 @@ class AddUserActivity : ConnectionsActivity() {
             send(Payload.fromBytes(myName.toByteArray(Charsets.UTF_8)))
         }
 
+        adapter = SearchAdapter(applicationContext, userList)
         UUID = FirebaseAuth.getInstance().currentUser!!.uid
 
     }
