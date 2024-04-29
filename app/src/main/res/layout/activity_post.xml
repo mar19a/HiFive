@@ -8,7 +8,7 @@
     tools:context=".Post.PostActivity">
 
     <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/materialToolbar"
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#FFFFFF"
@@ -28,32 +28,78 @@
         android:src="@drawable/post"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/materialToolbar"
-        app:layout_constraintTop_toBottomOf="@+id/materialToolbar"
-        app:layout_constraintBottom_toTopOf="@+id/caption"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintBottom_toTopOf="@+id/titlecaption"
         app:riv_border_color="#333333"
         app:riv_border_width="2dip"
         app:riv_corner_radius="20dip" />
 
-    <com.google.android.material.textfield.TextInputLayout
+<!--    <com.google.android.material.textfield.TextInputLayout-->
 
-        android:id="@+id/caption"
-        android:layout_width="0dp"
+<!--        android:id="@+id/caption"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="24dp"-->
+<!--        android:layout_marginStart="20dp"-->
+<!--        android:layout_marginEnd="20dp"-->
+<!--        android:hint="Write a description"-->
+<!--        app:boxStrokeColor="@color/pink"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/select_image" >-->
+
+<!--        <com.google.android.material.textfield.TextInputEditText-->
+
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:maxLines="2"-->
+<!--            android:visibility="visible" />-->
+
+<!--    </com.google.android.material.textfield.TextInputLayout>-->
+
+    <LinearLayout
+        android:id="@+id/titlecaption"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:hint="Write a caption"
-        app:boxStrokeColor="@color/pink"
-        app:layout_constraintEnd_toEndOf="@+id/select_image"
-        app:layout_constraintStart_toStartOf="@+id/select_image"
+        android:orientation="vertical"
+        android:layout_margin="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/select_image" >
 
-        <com.google.android.material.textfield.TextInputEditText
-
+        <!-- Title Input -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="visible" />
+            android:hint="Title">
 
-    </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/titleEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Description Input -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Description">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/descriptionEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:lines="3" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </LinearLayout>
 
 
     <Button
@@ -63,12 +109,12 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:layout_marginTop="10dp"
-        android:layout_marginLeft="40dp"
-        android:layout_marginRight="40dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         android:hint="Choose Location"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/caption"
+        app:layout_constraintTop_toBottomOf="@+id/titlecaption"
         app:layout_constraintBottom_toTopOf="@+id/datetime"
         app:strokeColor="@color/black" />
 
@@ -112,8 +158,8 @@
         style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="40dp"
-        android:layout_marginRight="40dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         android:layout_marginBottom="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -123,9 +169,11 @@
         >
 
         <AutoCompleteTextView
+            android:id="@+id/eventtype"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="none"
+            android:text="Other"
             app:simpleItems="@array/event_options"
             />
 
@@ -201,6 +249,7 @@
             android:layout_margin="10dp"
             android:layout_weight="1"
             android:backgroundTint="@color/blue"
+            android:enabled="false"
             android:text="Post" />
     </LinearLayout>
 

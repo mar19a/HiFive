@@ -3,8 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/options"
-        android:icon="@drawable/bars"
-        android:title="options"
+        android:icon="@drawable/message"
+        android:title="message"
         app:showAsAction="always"/>
 
 </menu>
