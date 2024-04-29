@@ -14,6 +14,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        dataBinding = true
     }
     defaultConfig {
         applicationId = "com.example.hifive"
@@ -57,6 +58,7 @@ dependencies {
     implementation(libs.navigation.fragment.ktx)
     implementation(libs.navigation.ui.ktx)
     implementation(libs.androidx.legacy.support.v4)
+    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -80,4 +82,6 @@ dependencies {
     implementation(libs.timeago)
 
     implementation("com.google.android.gms:play-services-maps:18.2.0")
+
+    implementation("com.google.android.gms:play-services-location:21.2.0")
 }

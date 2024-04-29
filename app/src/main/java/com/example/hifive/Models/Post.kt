@@ -3,6 +3,8 @@ package com.example.hifive.Models
 import com.google.android.gms.maps.model.LatLng
 
 class Post {
+    var postId: String = ""
+    var title:String=""
     var postUrl:String=""
     var caption:String=""
     var uid:String=""
@@ -10,24 +12,40 @@ class Post {
     var eventAddr:String=""
     var eventType:String=""
     var eventLoc:String=""
-
+    var eventDate:String=""
+    var eventTime:String=""
+    var isLikedByCurrentUser: Boolean = false
 
 
     constructor()
 
-    constructor(postUrl: String,caption:String) {
+    constructor(postId: String, postUrl: String, caption: String) {
+        this.postId = postId
         this.postUrl = postUrl
-        this.caption=caption
+        this.caption = caption
     }
 
-    constructor(postUrl: String, caption: String, uid: String, time: String) {
+    constructor(postId: String, postUrl: String, caption: String, uid: String, time: String) {
+        this.postId = postId
         this.postUrl = postUrl
         this.caption = caption
         this.uid = uid
         this.time = time
     }
 
-    constructor(postUrl: String, caption: String, uid: String, time: String, addr: String, loc: String, etype: String) {
+    constructor(postId: String, postUrl: String, caption: String, uid: String, time: String, addr: String, loc: String) {
+        this.postId = postId
+        this.postUrl = postUrl
+        this.caption = caption
+        this.uid = uid
+        this.time = time
+        this.eventAddr = addr
+        this.eventLoc = loc
+    }
+
+    constructor(postId: String, title: String, postUrl: String, caption: String, uid: String, time: String, addr: String, loc: String, etype: String) {
+        this.postId = postId
+        this.title = title
         this.postUrl = postUrl
         this.caption = caption
         this.uid = uid
@@ -36,6 +54,4 @@ class Post {
         this.eventLoc = loc
         this.eventType = etype
     }
-
-
 }
