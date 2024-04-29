@@ -69,7 +69,6 @@ class MessageFragment : Fragment() {
             return
         }
 
-        // Safely constructing the collection path using the current user's UID
         val followingCollection = currentUser + FOLLOW
         Firebase.firestore.collection(followingCollection).get()
             .addOnSuccessListener { documents ->
