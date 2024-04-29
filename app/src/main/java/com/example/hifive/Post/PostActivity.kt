@@ -40,6 +40,10 @@ class PostActivity : AppCompatActivity() {
 
     private lateinit var loc: String
 
+    private var edate = ""
+
+    private var etime = ""
+
     private var etype = "Other"
 
     private var loc_enabled = false
@@ -135,6 +139,8 @@ class PostActivity : AppCompatActivity() {
                     val selectedDate = "$selectedDay/${selectedMonth + 1}/$selectedYear"
                     // You can do something with the selectedDate here, such as displaying it in a TextView
                     binding.date.text = selectedDate
+                    edate = selectedDate
+                    Log.d("PostActivity", "date:${edate}")
                 },
                 year,
                 month,
@@ -157,6 +163,8 @@ class PostActivity : AppCompatActivity() {
                     val selectedTime = format12HourTime(selectedHour, selectedMinute)
                     // You can do something with the selectedTime here, such as displaying it in a TextView
                     binding.time.text = selectedTime
+                    etime = selectedTime
+                    Log.d("PostActivity", "time:${etime}")
                 },
                 hour,
                 minute,
@@ -189,6 +197,8 @@ class PostActivity : AppCompatActivity() {
                     postUrl = imageUrl!!, // Assign the uploaded image URL to the post
                     addr = addr,
                     loc = loc,
+                    edate = edate,
+                    etime = etime,
                     etype = binding.event.editText?.text.toString()
                 )
 

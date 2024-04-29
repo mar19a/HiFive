@@ -43,7 +43,8 @@ class Post {
         this.eventLoc = loc
     }
 
-    constructor(postId: String, title: String, postUrl: String, caption: String, uid: String, time: String, addr: String, loc: String, etype: String) {
+    //everything
+    constructor(postId: String, title: String, postUrl: String, caption: String, uid: String, time: String, addr: String, loc: String, edate: String, etime: String, etype: String) {
         this.postId = postId
         this.title = title
         this.postUrl = postUrl
@@ -52,6 +53,8 @@ class Post {
         this.time = time
         this.eventAddr = addr
         this.eventLoc = loc
+        this.eventDate = edate
+        this.eventTime = etime
         this.eventType = etype
     }
 }
