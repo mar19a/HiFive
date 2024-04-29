@@ -9,17 +9,28 @@ import com.example.hifive.R
 import com.example.hifive.databinding.ItemUserBinding
 class UserChatAdapter(
     private val context: Context,
-    private val userList: List<User>,
-    private val userIds: List<String>, // List of user IDs corresponding to userList
-    private val onUserClick: (String) -> Unit // Expecting user ID
+    private var userList: MutableList<User>,
+    private var userIds: MutableList<String>,
+    private val onUserClick: (String) -> Unit
 ) : RecyclerView.Adapter<UserChatAdapter.UserViewHolder>() {
+
+    fun updateUsers(newUsers: List<User>, newUserIds: List<String>) {
+        if (newUsers.size != newUserIds.size) {
+            throw IllegalArgumentException("Users and User IDs lists must have the same size")
+        }
+        userList.clear()
+        userIds.clear()
+        userList.addAll(newUsers)
+        userIds.addAll(newUserIds)
+        notifyDataSetChanged()
+    }
 
     inner class UserViewHolder(val binding: ItemUserBinding) : RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
-                    onUserClick(userIds[position]) // Pass the user ID instead of the user object
+                    onUserClick(userIds[position])
                 }
             }
         }

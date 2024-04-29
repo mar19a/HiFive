@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,18 +14,23 @@ import com.example.hifive.R
 import com.example.hifive.adapters.UserChatAdapter
 import com.example.hifive.databinding.FragmentMessageBinding
 import com.example.hifive.utils.USER_NODE
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
+import com.example.hifive.utils.FOLLOW
+import com.google.firebase.auth.ktx.auth
+import android.util.Log
+
 
 class MessageFragment : Fragment() {
     private lateinit var binding: FragmentMessageBinding
     private lateinit var userChatAdapter: UserChatAdapter
     private var userList = ArrayList<User>()
-    private var userIdList = ArrayList<String>()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
         binding = FragmentMessageBinding.inflate(inflater, container, false)
 
         setupToolbar()
@@ -37,12 +43,12 @@ class MessageFragment : Fragment() {
     private fun setupToolbar() {
         val backButton = binding.toolbar.findViewById<ImageView>(R.id.backButton)
         backButton.setOnClickListener {
-            findNavController().navigateUp()  // Navigate up in the navigation stack
+            findNavController().navigateUp()
         }
     }
 
     private fun setupRecyclerView() {
-        userChatAdapter = UserChatAdapter(requireContext(), userList, userIdList) { userId ->
+        userChatAdapter = UserChatAdapter(requireContext(), userList, arrayListOf()) { userId ->
             navigateToChatRoom(userId)
         }
         binding.messagesRecyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -57,17 +63,32 @@ class MessageFragment : Fragment() {
     }
 
     private fun loadUsers() {
-        Firebase.firestore.collection(USER_NODE).get()
-            .addOnSuccessListener { result ->
-                userList.clear()
-                userIdList.clear()
-                result.documents.forEach { document ->
+        val currentUser = Firebase.auth.currentUser?.uid
+        if (currentUser == null) {
+            Toast.makeText(context, "Not logged in", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        // Safely constructing the collection path using the current user's UID
+        val followingCollection = currentUser + FOLLOW
+        Firebase.firestore.collection(followingCollection).get()
+            .addOnSuccessListener { documents ->
+                val tempList = ArrayList<User>()
+                val tempIds = ArrayList<String>()
+                documents.forEach { document ->
                     document.toObject<User>()?.let { user ->
-                        userList.add(user)
-                        userIdList.add(document.id)
+                        tempList.add(user)
+                        tempIds.add(document.id)
                     }
                 }
-                userChatAdapter.notifyDataSetChanged()
+                userChatAdapter.updateUsers(tempList, tempIds)
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(context, "Failed to fetch following list: ${e.message}", Toast.LENGTH_LONG).show()
+                Log.e("MessageFragment", "Error fetching following list", e)
             }
     }
+
+
+
 }

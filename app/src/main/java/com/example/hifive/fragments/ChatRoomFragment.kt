@@ -36,22 +36,43 @@ class ChatRoomFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val toUserId = arguments?.getString("userId") ?: return
+
         binding.sendMessageButton.setOnClickListener {
             val messageText = binding.messageInputEditText.text.toString()
             if (messageText.isNotEmpty()) {
-                sendMessageToFirebase(messageText)
+                sendMessageToFirebase(toUserId, messageText)
                 binding.messageInputEditText.setText("")
             }
         }
     }
 
-    private fun sendMessageToFirebase(messageText: String) {
+
+    private fun sendMessageToFirebase(toUserId: String, messageText: String) {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        val fromUserId = currentUser?.uid
+        if (fromUserId == null) {
+            Toast.makeText(context, "Error: User not logged in", Toast.LENGTH_LONG).show()
+            return
+        }
+
+
+        val chatSessionId = if (compareValuesBy(fromUserId, toUserId, { it }) <= 0) {
+            "$fromUserId$toUserId"
+        } else {
+            "$toUserId$fromUserId"
+        }
+
         val messageData = hashMapOf(
-            "fromUserId" to FirebaseAuth.getInstance().currentUser?.uid,
+            "fromUserId" to fromUserId,
             "messageText" to messageText,
             "timestamp" to FieldValue.serverTimestamp()
         )
-        FirebaseFirestore.getInstance().collection("chatMessages").add(messageData)
+
+        FirebaseFirestore.getInstance().collection("chatSessions")
+            .document(chatSessionId)
+            .collection("messages")
+            .add(messageData)
             .addOnSuccessListener {
                 Toast.makeText(context, "Message sent successfully", Toast.LENGTH_SHORT).show()
             }
@@ -59,6 +80,9 @@ class ChatRoomFragment : Fragment() {
                 Toast.makeText(context, "Failed to send message: ${e.message}", Toast.LENGTH_LONG).show()
             }
     }
+
+
+
 
     override fun onDestroyView() {
         super.onDestroyView()
