@@ -1,6 +1,7 @@
 package com.example.hifive.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,13 +16,15 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.hifive.adapters.MessageAdapter
 import com.example.hifive.Models.Message
+import com.example.hifive.Models.User
 import com.google.firebase.Timestamp
+import com.example.hifive.utils.USER_NODE
 
 class ChatRoomFragment : Fragment() {
     private var _binding: FragmentChatRoomBinding? = null
     private val binding get() = _binding!!
     private lateinit var messageAdapter: MessageAdapter
-    private lateinit var layoutManager: LinearLayoutManager // Ensure layoutManager is declared and initialized
+    private lateinit var layoutManager: LinearLayoutManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentChatRoomBinding.inflate(inflater, container, false)
@@ -38,7 +41,7 @@ class ChatRoomFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        layoutManager = LinearLayoutManager(context) // Initialize layoutManager here
+        layoutManager = LinearLayoutManager(context)
         messageAdapter = MessageAdapter(mutableListOf())
         binding.messagesRecyclerView.adapter = messageAdapter
         binding.messagesRecyclerView.layoutManager = layoutManager
@@ -48,21 +51,21 @@ class ChatRoomFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val toUserId = arguments?.getString("userId") ?: return
 
-        loadMessages(toUserId)
+        val fromUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val chatSessionId = getChatSessionId(fromUserId, toUserId)
+
+        loadMessages(chatSessionId)
 
         binding.sendMessageButton.setOnClickListener {
             val messageText = binding.messageInputEditText.text.toString()
             if (messageText.isNotEmpty()) {
-                sendMessageToFirebase(toUserId, messageText)
+                sendMessageToFirebase(toUserId, fromUserId, chatSessionId, messageText)
                 binding.messageInputEditText.setText("")
             }
         }
     }
 
-    private fun loadMessages(toUserId: String) {
-        val fromUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val chatSessionId = if (fromUserId < toUserId) "$fromUserId$toUserId" else "$toUserId$fromUserId"
-
+    private fun loadMessages(chatSessionId: String) {
         FirebaseFirestore.getInstance().collection("chatSessions")
             .document(chatSessionId)
             .collection("messages")
@@ -74,42 +77,57 @@ class ChatRoomFragment : Fragment() {
                 }
                 val messages = snapshot?.documents?.mapNotNull { it.toObject(Message::class.java) }
                 messageAdapter.updateMessages(messages ?: listOf())
-                layoutManager.scrollToPosition(messageAdapter.itemCount - 1)
+                if (messages != null && messages.isNotEmpty()) {
+                    layoutManager.scrollToPosition(messageAdapter.itemCount - 1)
+                }
             }
     }
 
-    private fun sendMessageToFirebase(toUserId: String, messageText: String) {
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        val fromUserId = currentUser?.uid
-        if (fromUserId == null) {
-            Toast.makeText(context, "Error: User not logged in", Toast.LENGTH_LONG).show()
-            return
-        }
+    private fun sendMessageToFirebase(toUserId: String, fromUserId: String, chatSessionId: String, messageText: String) {
+        FirebaseFirestore.getInstance().collection(USER_NODE).document(fromUserId).get()
+            .addOnSuccessListener { documentSnapshot ->
+                val user = documentSnapshot.toObject(User::class.java)
+                if (user != null) {
+                    val senderName = user.name ?: "Unknown User"
+                    val senderProfileImageUrl = user.image ?: ""
 
-        val messageId = FirebaseFirestore.getInstance().collection("chatSessions").document().id
-        val timestamp = Timestamp.now() // Use Firebase Timestamp here
-        val message = Message(
-            messageId,
-            fromUserId,
-            toUserId,
-            messageText,
-            timestamp
-        )
+                    val messageId = FirebaseFirestore.getInstance().collection("chatSessions").document().id
+                    val timestamp = Timestamp.now()
+                    val message = Message(
+                        messageId,
+                        fromUserId,
+                        toUserId,
+                        messageText,
+                        timestamp,
+                        senderName,
+                        senderProfileImageUrl
+                    )
 
-        val chatSessionId = if (fromUserId < toUserId) "$fromUserId$toUserId" else "$toUserId$fromUserId"
-        FirebaseFirestore.getInstance().collection("chatSessions")
-            .document(chatSessionId)
-            .collection("messages")
-            .document(messageId)
-            .set(message)
-            .addOnSuccessListener {
-                Toast.makeText(context, "Message sent successfully", Toast.LENGTH_SHORT).show()
+                    FirebaseFirestore.getInstance().collection("chatSessions")
+                        .document(chatSessionId)
+                        .collection("messages")
+                        .document(messageId)
+                        .set(message)
+                        .addOnSuccessListener {
+                            Toast.makeText(context, "Message sent successfully", Toast.LENGTH_SHORT).show()
+                        }
+                        .addOnFailureListener { e ->
+                            Toast.makeText(context, "Failed to send message: ${e.message}", Toast.LENGTH_LONG).show()
+                        }
+                } else {
+                    Toast.makeText(context, "User data is incomplete. Sender set to Unknown.", Toast.LENGTH_LONG).show()
+                }
             }
             .addOnFailureListener { e ->
-                Toast.makeText(context, "Failed to send message: ${e.message}", Toast.LENGTH_LONG).show()
+                Log.e("ChatRoomFragment", "Error fetching user details: ${e.message}")
+                Toast.makeText(context, "Error fetching user details: ${e.message}", Toast.LENGTH_LONG).show()
             }
     }
 
+    private fun getChatSessionId(userId1: String, userId2: String): String {
+        val ids = listOf(userId1, userId2).sorted()
+        return "${ids[0]}_${ids[1]}"
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

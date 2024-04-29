@@ -8,6 +8,7 @@ import com.bumptech.glide.Glide
 import com.example.hifive.R
 import com.example.hifive.databinding.ItemMessageBinding
 import com.google.firebase.Timestamp
+import android.util.Log
 
 class MessageAdapter(private val messages: MutableList<Message>) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
 
@@ -26,7 +27,6 @@ class MessageAdapter(private val messages: MutableList<Message>) : RecyclerView.
         messages.addAll(newMessages)
         notifyDataSetChanged()
     }
-
     class MessageViewHolder(private val binding: ItemMessageBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(message: Message) {
             binding.messageTextView.text = message.messageText
@@ -36,10 +36,11 @@ class MessageAdapter(private val messages: MutableList<Message>) : RecyclerView.
                 .load(message.senderProfileImageUrl)
                 .placeholder(R.drawable.user)
                 .into(binding.profileImageView)
+            Log.d("MessageAdapter", "Binding message from ${message.senderName} with text: ${message.messageText} and timestamp: ${formatDate(message.timestamp)}")
         }
 
         private fun formatDate(timestamp: Timestamp?): String {
-            return timestamp?.toDate()?.toString() ?: ""
+            return timestamp?.toDate()?.toString() ?: "No Timestamp"
         }
     }
 }
