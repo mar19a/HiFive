@@ -6,6 +6,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SeekBar
+import android.location.Location
+import android.widget.Toast
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -35,8 +38,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
 
-    //private val default = LatLng(0.0, 0.0)
-
     private var postList = ArrayList<Post>()
 
     private val mapsVM: MapsViewModel by activityViewModels()
@@ -60,15 +61,21 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         mapFragment = childFragmentManager.findFragmentById(R.id.mapFragment) as? SupportMapFragment
         mapFragment?.getMapAsync(this)
 
-        binding.zoomIn.setOnClickListener {
-            // Increase the zoom level
-            updateCameraZoom(1)
-        }
+        binding.zooming.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                // Update UI or perform actions based on the progress change
+                updateCameraZoom(progress)
+            }
 
-        binding.zoomOut.setOnClickListener {
-            // Increase the zoom level
-            updateCameraZoom(-1)
-        }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                // Called when the user starts moving the thumb
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                // Called when the user stops moving the thumb
+            }
+        })
+
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -76,24 +83,23 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         //getLocation()
 
         mMap = googleMap
-//        val loc = mapsVM.getLocation()
-//        if (loc != null) {
-//            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(loc, 15f))
-//        } else {
-//            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(default, 15f))
-//        }
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mapsVM.getLocation()!!, 15f))
 
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mapsVM.getLocation()!!, 15f))
 
         Firebase.firestore.collection("posts").get().addOnSuccessListener {
             val tempList = ArrayList<Post>()
             postList.clear()
+            var ploc = LatLng(0.0,0.0)
             for ((index,i) in it.documents.withIndex()) {
 
                 val post: Post = i.toObject<Post>()!!
                 tempList.add(post)
                 //Log.d("MapsFragment", tempList[index].eventLoc)
                 val loc = convertStringToLatLng(tempList[index].eventLoc)
+//                if (index == 0)
+//                    ploc = loc
+//                if (index == 1)
+//                    Log.d("MapsFragment", "distance between ${ploc} and ${loc} = ${calcDistance(ploc, loc, "Miles")}")
                 //Log.d("MapsFragment", loc.toString())
                 val icon: BitmapDescriptor = if (tempList[index].eventType == "Social") {
                     BitmapDescriptorFactory.fromResource(R.drawable.markertest)
@@ -110,6 +116,18 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             }
             postList.addAll(tempList)
             //Log.d("mapsf", postList.size.toString())
+        }
+        //Log.d("MapsFragment", "distance between ${postList[0].eventLoc} and ${postList[1].eventLoc} =")
+
+        mMap.setOnMarkerClickListener { marker ->
+            // Handle marker click event here
+            //val markerTag = marker.tag
+            // Use markerTag as needed
+
+            // Example: Display a toast with the marker title
+            //Toast.makeText(context, "Clicked marker: ${marker.title}", Toast.LENGTH_SHORT).show()
+
+            false // Return true to consume the event and prevent default behavior (such as showing info window)
         }
    }
 
@@ -135,7 +153,26 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
 
     private fun updateCameraZoom(zoom: Int) {
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(mMap.cameraPosition.zoom + zoom))
+        //mMap.animateCamera(CameraUpdateFactory.zoomTo(mMap.cameraPosition.zoom + zoom))
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(zoom.toFloat()))
+        Log.d("MapsFragment", mMap.cameraPosition.zoom.toString())
+    }
+
+
+    private fun calcDistance(llng1: LatLng, llng2 : LatLng, type: String) : Float {
+        val loc1 = Location("llng1")
+        val loc2 = Location("llng2")
+        loc1.latitude = llng1.latitude
+        loc2.latitude = llng2.latitude
+        loc1.longitude = llng1.longitude
+        loc2.longitude = llng2.longitude
+        return if (type == "Miles")
+            loc1.distanceTo(loc2) / 1609.344f
+        else if (type == "Km")
+            loc1.distanceTo(loc2) / 1000f
+        else
+            loc1.distanceTo(loc2)
+
     }
 
 
