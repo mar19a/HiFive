@@ -52,8 +52,11 @@ class ChatRoomFragment : Fragment() {
         val toUserId = arguments?.getString("userId") ?: return
         val fromUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
+        Log.d("ChatRoomFragment", "Received toUserId: $toUserId")
+        Log.d("ChatRoomFragment", "Current fromUserId: $fromUserId")
         // Ensuring the chat session ID is generated consistently
         val chatSessionId = getChatSessionId(fromUserId, toUserId)
+        Log.d("ChatRoomFragment", "Using Chat Session ID: $chatSessionId")
         loadMessages(chatSessionId)
 
         binding.sendMessageButton.setOnClickListener {

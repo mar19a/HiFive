@@ -49,6 +49,7 @@ class MessageFragment : Fragment() {
 
     private fun setupRecyclerView() {
         userChatAdapter = UserChatAdapter(requireContext(), userList, arrayListOf()) { userId ->
+            Log.d("MessageFragment", "Navigating to ChatRoom with userId: $userId")
             navigateToChatRoom(userId)
         }
         binding.messagesRecyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -69,24 +70,37 @@ class MessageFragment : Fragment() {
             return
         }
 
-        val followingCollection = currentUser + FOLLOW
+        val followingCollection = "$currentUser$FOLLOW"
         Firebase.firestore.collection(followingCollection).get()
             .addOnSuccessListener { documents ->
-                val tempList = ArrayList<User>()
-                val tempIds = ArrayList<String>()
-                documents.forEach { document ->
-                    document.toObject<User>()?.let { user ->
-                        tempList.add(user)
-                        tempIds.add(document.id)
-                    }
+                val emails = documents.mapNotNull { it.getString("email") }
+                if (emails.isNotEmpty()) {
+                    fetchUsersByEmails(emails)
+                } else {
+                    Toast.makeText(context, "No followings found or missing emails.", Toast.LENGTH_SHORT).show()
                 }
-                userChatAdapter.updateUsers(tempList, tempIds)
             }
             .addOnFailureListener { e ->
                 Toast.makeText(context, "Failed to fetch following list: ${e.message}", Toast.LENGTH_LONG).show()
                 Log.e("MessageFragment", "Error fetching following list", e)
             }
     }
+
+    private fun fetchUsersByEmails(emails: List<String>) {
+        Firebase.firestore.collection(USER_NODE)
+            .whereIn("email", emails)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val userList = querySnapshot.documents.mapNotNull { it.toObject(User::class.java)?.apply { uid = it.id } }
+                val userIds = userList.map { it.uid!! } // Now we have the actual userIds
+                userChatAdapter.updateUsers(userList, userIds)
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(context, "Error fetching user details: ${e.message}", Toast.LENGTH_LONG).show()
+                Log.e("MessageFragment", "Error fetching user details", e)
+            }
+    }
+
 
 
 
