@@ -71,33 +71,41 @@ class MessageFragment : Fragment() {
         }
 
         val followingCollection = "$currentUser$FOLLOW"
-        Firebase.firestore.collection(followingCollection).get()
-            .addOnSuccessListener { documents ->
-                val emails = documents.mapNotNull { it.getString("email") }
-                if (emails.isNotEmpty()) {
+        Firebase.firestore.collection(followingCollection)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Toast.makeText(context, "Error fetching following list: ${e.message}", Toast.LENGTH_LONG).show()
+                    Log.e("MessageFragment", "Error fetching following list", e)
+                    return@addSnapshotListener
+                }
+
+                val emails = snapshot?.documents?.mapNotNull { it.getString("email") }
+                if (emails != null && emails.isNotEmpty()) {
                     fetchUsersByEmails(emails)
                 } else {
+                    userChatAdapter.updateUsers(emptyList(), emptyList()) // Clear the list if no following found
                     Toast.makeText(context, "No followings found or missing emails.", Toast.LENGTH_SHORT).show()
                 }
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(context, "Failed to fetch following list: ${e.message}", Toast.LENGTH_LONG).show()
-                Log.e("MessageFragment", "Error fetching following list", e)
             }
     }
 
     private fun fetchUsersByEmails(emails: List<String>) {
         Firebase.firestore.collection(USER_NODE)
             .whereIn("email", emails)
-            .get()
-            .addOnSuccessListener { querySnapshot ->
-                val userList = querySnapshot.documents.mapNotNull { it.toObject(User::class.java)?.apply { uid = it.id } }
-                val userIds = userList.map { it.uid!! } // Now we have the actual userIds
+            .addSnapshotListener { querySnapshot, e ->
+                if (e != null) {
+                    Toast.makeText(context, "Error fetching user details: ${e.message}", Toast.LENGTH_LONG).show()
+                    Log.e("MessageFragment", "Error fetching user details", e)
+                    return@addSnapshotListener
+                }
+
+                val userList = querySnapshot?.documents?.mapNotNull { doc ->
+                    doc.toObject(User::class.java)?.apply { uid = doc.id }
+                } ?: listOf()
+
+                val userIds = userList.mapNotNull { it.uid }
                 userChatAdapter.updateUsers(userList, userIds)
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(context, "Error fetching user details: ${e.message}", Toast.LENGTH_LONG).show()
-                Log.e("MessageFragment", "Error fetching user details", e)
+                Log.d("MessageFragment", "Loaded users and IDs: $userIds")
             }
     }
 
