@@ -53,6 +53,8 @@ class AddUserActivity : ConnectionsActivity() {
 
     private lateinit var sendIdButton : Button
 
+    private lateinit var scanQRButton : Button
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -82,6 +84,9 @@ class AddUserActivity : ConnectionsActivity() {
             send(Payload.fromBytes(UUID.toByteArray(Charsets.UTF_8)))
 
         }
+
+        scanQRButton = findViewById(R.id.scanQRButton)
+
 
         adapter = SearchAdapter(applicationContext, userList)
         rv = findViewById(R.id.recyclerView)
