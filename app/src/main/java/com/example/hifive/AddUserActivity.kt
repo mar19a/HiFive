@@ -1,31 +1,37 @@
 package com.example.hifive
 
-import com.google.android.gms.nearby.connection.Strategy
-import android.Manifest
-import android.animation.Animator
+import android.content.Context
+import android.content.Intent
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
+import android.net.Uri
 import android.os.Bundle
-import android.os.Build
+import android.speech.tts.TextToSpeech
 import android.util.Log
-import com.google.android.gms.nearby.connection.Payload
-import com.google.android.gms.nearby.connection.ConnectionInfo
-import kotlin.random.Random
-import android.widget.Toast
-import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hifive.Models.User
-import com.google.firebase.auth.FirebaseAuth
-import com.squareup.picasso.Picasso
 import com.example.hifive.adapters.SearchAdapter
 import com.example.hifive.utils.USER_NODE
+import com.google.android.gms.nearby.connection.ConnectionInfo
+import com.google.android.gms.nearby.connection.Payload
+import com.google.android.gms.nearby.connection.Strategy
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
+import com.google.zxing.integration.android.IntentIntegrator
+import com.squareup.picasso.Picasso
+import java.util.Objects
+import kotlin.math.sqrt
+import kotlin.random.Random
 
 
 class AddUserActivity : ConnectionsActivity() {
@@ -44,14 +50,22 @@ class AddUserActivity : ConnectionsActivity() {
     private lateinit var rv : RecyclerView
 
     private lateinit var addUserText : TextView
-    private lateinit var userIDText : TextView
-    private lateinit var connectedIDText : TextView
+    //lateinit var userIDText : TextView
+    //private lateinit var connectedIDText : TextView
 
     private lateinit var UUID : String
 
     private lateinit var qrFrame : ImageView
 
     private lateinit var sendIdButton : Button
+
+    private lateinit var scanQRButton : Button
+
+    //Variables for motion detection
+    private var sensorManager: SensorManager? = null
+    private var acceleration = 0f
+    private var currentAcceleration = 0f
+    private var lastAcceleration = 0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,44 +76,143 @@ class AddUserActivity : ConnectionsActivity() {
         //myName = getRandomString(8)
 
         addUserText = findViewById(R.id.addUserDialog)
-        userIDText = findViewById(R.id.debugUserID)
+        //userIDText = findViewById(R.id.debugUserID)
 
-        connectedIDText = findViewById(R.id.debugConnectedID)
+        //connectedIDText = findViewById(R.id.debugConnectedID)
         qrFrame = findViewById(R.id.testQr)
 
         UUID = FirebaseAuth.getInstance().currentUser!!.uid
-        myName = UUID
+        myName = FirebaseAuth.getInstance().currentUser!!.displayName!!
 
-        Picasso.get().load("https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="+myName).into(qrFrame)
+        //Generate QR Code encoding UUID
+        Picasso.get().load("https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="+UUID).into(qrFrame)
 
 
         //Debug TextView (To remove)
-        userIDText.text = "UUID: " + myName
+        //userIDText.text = "UUID: " + myName
 
         sendIdButton = findViewById(R.id.sendIDButton)
         sendIdButton.setOnClickListener{
-            Log.d("Check UUID", UUID)
+            //Log.d("Check UUID", UUID)
             send(Payload.fromBytes(UUID.toByteArray(Charsets.UTF_8)))
+            Toast.makeText(applicationContext, getString(R.string.user_data_sent), Toast.LENGTH_SHORT).show()
 
+        }
+
+        scanQRButton = findViewById(R.id.scanQRButton)
+        scanQRButton.setOnClickListener {
+            initQRCodeScanner()
         }
 
         adapter = SearchAdapter(applicationContext, userList)
         rv = findViewById(R.id.recyclerView)
         rv.layoutManager = LinearLayoutManager(applicationContext)
         rv.adapter = adapter
+
+        //Initialize Sensor Manager
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        Objects.requireNonNull(sensorManager)!!
+            .registerListener(sensorListener, sensorManager!!
+                .getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL)
+
+        acceleration = 10f
+        currentAcceleration = SensorManager.GRAVITY_EARTH
+        lastAcceleration = SensorManager.GRAVITY_EARTH
+
     }
 
-    private fun getRandomString(length: Int) : String {
+    //Wrapper function to initiate a scan activity from the ZXing library
+    private fun initQRCodeScanner() {
+        val integrator = IntentIntegrator(this)
+        integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
+        integrator.setOrientationLocked(false)
+        integrator.setPrompt("")
+        integrator.initiateScan()
+    }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
+        if (result != null) {
+            if (result.contents == null) {
+                Toast.makeText(this, getString(R.string.invalid_scan), Toast.LENGTH_LONG).show()
+            } else {
+                Firebase.firestore.collection(USER_NODE).get().addOnSuccessListener {
+
+                    var tempList = ArrayList<User>()
+                    userList.clear()
+                    for (i in it.documents) {
+
+                        if (i.id == Firebase.auth.currentUser!!.uid) {
+
+                        } else {
+                            //Log.d("iterated user id", i.id)
+
+                            if (result.contents == i.id) {
+                                //Check if payload is ever caught
+                                //Log.d("debug query", "test query matched")
+                                var user: User = i.toObject<User>()!!
+
+                                tempList.add(user)
+                            }
+                        }
+
+                    }
+
+                    userList.addAll(tempList)
+                    adapter.notifyDataSetChanged()
+                }
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
+    //Implementation for SensorEventListener to detect shaking
+    private val sensorListener: SensorEventListener = object : SensorEventListener {
+        override fun onSensorChanged(event: SensorEvent) {
+
+            val x = event.values[0]
+            val y = event.values[1]
+            val z = event.values[2]
+            lastAcceleration = currentAcceleration
+
+            currentAcceleration = sqrt((x * x + y * y + z * z).toDouble()).toFloat()
+            val delta: Float = currentAcceleration - lastAcceleration
+            acceleration = acceleration * 0.9f + delta
+
+            //"On Shake Function"
+            if (acceleration > 11) {
+                //Log.d("Sensors","Shake Detected")
+                if(mState == State.CONNECTED){
+                    send(Payload.fromBytes(UUID.toByteArray(Charsets.UTF_8)))
+                    Toast.makeText(applicationContext,
+                        getString(R.string.user_data_sent), Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
+    }
+
+    //Temporary Debug Function
+    /*private fun getRandomString(length: Int) : String {
         val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
         return (1..length)
             .map { allowedChars.random() }
             .joinToString("")
     }
+    */
 
     override fun onStart(){
         super.onStart()
 
         setState(State.SEARCHING)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        setState(State.UNKNOWN)
+        disconnectFromAllEndpoints()
     }
 
     //Required Getters for Class implementation
@@ -120,12 +233,13 @@ class AddUserActivity : ConnectionsActivity() {
     }
 
     override fun onEndpointConnected(endpoint: Endpoint?) {
-        Toast.makeText(this, "Connected to" + endpoint?.name, Toast.LENGTH_SHORT).show()
+        Toast.makeText(this,
+            getString(R.string.connected_to_text) + endpoint?.name, Toast.LENGTH_SHORT).show()
         setState(State.CONNECTED)
     }
 
     override fun onEndpointDisconnected(endpoint: Endpoint?) {
-        Toast.makeText(this, "Disconnected", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.disconnect_text), Toast.LENGTH_SHORT).show()
         setState(State.SEARCHING)
     }
 
@@ -146,13 +260,13 @@ class AddUserActivity : ConnectionsActivity() {
         //Change Nearby Connections behavior to new state
         when(newState){
             State.SEARCHING -> {
-                addUserText.text = "Searching For Nearby Users..."
+                addUserText.text = getString(R.string.searching_text)
                 disconnectFromAllEndpoints()
                 startDiscovering()
                 startAdvertising()
             }
             State.CONNECTED -> {
-                addUserText.text = "Nearby User Found!"
+                addUserText.text = getString(R.string.connected_text)
                 stopDiscovering()
                 stopAdvertising()
             }
@@ -177,12 +291,11 @@ class AddUserActivity : ConnectionsActivity() {
 
     override fun onReceive(endpoint: Endpoint?, payload: Payload?) {
         if (payload!!.type == Payload.Type.BYTES) {
-            connectedIDText.text = payload.asBytes()!!.toString(Charsets.UTF_8)
-            //TODO: Parse Bytes Here And Display Follow RV for User
+            val otherUserID = payload.asBytes()!!.toString(Charsets.UTF_8)
             Firebase.firestore.collection(USER_NODE).get().addOnSuccessListener {
                 //Debug Statement
                 //Log.d("firebase debug", "payload received, OnSuccess called")
-                Log.d("firebase debug", "Payload:" + payload.asBytes()!!.toString(Charsets.UTF_8))
+                //Log.d("firebase debug", "Payload:" + payload.asBytes()!!.toString(Charsets.UTF_8))
 
                 var tempList = ArrayList<User>()
                 userList.clear()
@@ -191,12 +304,12 @@ class AddUserActivity : ConnectionsActivity() {
                     if (i.id == Firebase.auth.currentUser!!.uid) {
 
                     } else {
-                        Log.d("iterated user id", i.id)
+                        //Log.d("iterated user id", i.id)
 
-                        if (connectedIDText.text == i.id) {
+                        if (otherUserID == i.id) {
                             //Check if payload is ever caught
-                            Log.d("debug query", "test query matched")
-                            var user: User = i.toObject<User>()!!
+                            //Log.d("debug query", "test query matched")
+                            val user: User = i.toObject<User>()!!
 
                             tempList.add(user)
                         }

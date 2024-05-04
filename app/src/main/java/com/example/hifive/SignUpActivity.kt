@@ -47,7 +47,7 @@ class SignUpActivity : AppCompatActivity() {
         user = User()
 
         if (intent.hasExtra("MODE") && intent.getIntExtra("MODE", -1) == 1) {
-            binding.signUpBtn.text = "Update Profile"
+            binding.signUpBtn.text = getString(R.string.update_profile_button)
             Firebase.auth.currentUser?.uid?.let { userId ->
                 Firebase.firestore.collection(USER_NODE).document(userId).get()
                     .addOnSuccessListener { documentSnapshot ->
@@ -63,7 +63,8 @@ class SignUpActivity : AppCompatActivity() {
                                 binding.password.editText?.setText(password)
                             }
                         } else {
-                            Toast.makeText(this, "Failed to fetch user data.", Toast.LENGTH_LONG).show()
+                            Toast.makeText(this,
+                                getString(R.string.failed_to_fetch_user_data), Toast.LENGTH_LONG).show()
                         }
                     }
             }
@@ -86,7 +87,7 @@ class SignUpActivity : AppCompatActivity() {
                 val email = binding.email.editText?.text.toString()
                 val password = binding.password.editText?.text.toString()
                 if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(this, "Please fill all information", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.incomplete_form_message), Toast.LENGTH_SHORT).show()
                 } else {
                     FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener { result ->

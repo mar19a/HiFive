@@ -23,7 +23,7 @@ class LoginActivity : AppCompatActivity() {
             ) {
                 Toast.makeText(
                     this@LoginActivity,
-                    "please fill all the details",
+                    getString(R.string.incomplete_form_message),
                     Toast.LENGTH_SHORT
                 ).show()
 

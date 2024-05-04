@@ -148,12 +148,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     Toast.makeText(this, address, Toast.LENGTH_SHORT).show()
                 } else {
                     // No address found
-                    Toast.makeText(this, "No address found for the location", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.no_address_found), Toast.LENGTH_SHORT).show()
                 }
             }
         } catch (e: IOException) {
             e.printStackTrace()
-            Toast.makeText(this, "Error getting address", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.address_error), Toast.LENGTH_SHORT).show()
         }
         return address
     }

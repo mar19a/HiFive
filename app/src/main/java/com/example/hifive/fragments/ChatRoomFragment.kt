@@ -50,19 +50,29 @@ class ChatRoomFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val toUserId = arguments?.getString("userId") ?: return
-
         val fromUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val chatSessionId = getChatSessionId(fromUserId, toUserId)
 
+        Log.d("ChatRoomFragment", "Received toUserId: $toUserId")
+        Log.d("ChatRoomFragment", "Current fromUserId: $fromUserId")
+        // Ensuring the chat session ID is generated consistently
+        val chatSessionId = getChatSessionId(fromUserId, toUserId)
+        Log.d("ChatRoomFragment", "Using Chat Session ID: $chatSessionId")
         loadMessages(chatSessionId)
 
         binding.sendMessageButton.setOnClickListener {
             val messageText = binding.messageInputEditText.text.toString()
             if (messageText.isNotEmpty()) {
                 sendMessageToFirebase(toUserId, fromUserId, chatSessionId, messageText)
+
                 binding.messageInputEditText.setText("")
             }
         }
+    }
+
+    private fun getChatSessionId(toUserId: String, fromUserId: String): String {
+        Log.d("ChatRoomFragment", "User2 ID (toUserId): $toUserId")
+        Log.d("ChatRoomFragment", "User1 ID (fromUserId): $fromUserId")
+        return if (toUserId < fromUserId) "$toUserId$fromUserId" else "$fromUserId$toUserId"
     }
 
     private fun loadMessages(chatSessionId: String) {
@@ -84,25 +94,18 @@ class ChatRoomFragment : Fragment() {
     }
 
     private fun sendMessageToFirebase(toUserId: String, fromUserId: String, chatSessionId: String, messageText: String) {
+        // Fetch user details from the USER_NODE collection before sending a message
         FirebaseFirestore.getInstance().collection(USER_NODE).document(fromUserId).get()
             .addOnSuccessListener { documentSnapshot ->
                 val user = documentSnapshot.toObject(User::class.java)
                 if (user != null) {
                     val senderName = user.name ?: "Unknown User"
                     val senderProfileImageUrl = user.image ?: ""
-
                     val messageId = FirebaseFirestore.getInstance().collection("chatSessions").document().id
                     val timestamp = Timestamp.now()
                     val message = Message(
-                        messageId,
-                        fromUserId,
-                        toUserId,
-                        messageText,
-                        timestamp,
-                        senderName,
-                        senderProfileImageUrl
+                        messageId, fromUserId, toUserId, messageText, timestamp, senderName, senderProfileImageUrl
                     )
-
                     FirebaseFirestore.getInstance().collection("chatSessions")
                         .document(chatSessionId)
                         .collection("messages")
@@ -119,14 +122,8 @@ class ChatRoomFragment : Fragment() {
                 }
             }
             .addOnFailureListener { e ->
-                Log.e("ChatRoomFragment", "Error fetching user details: ${e.message}")
                 Toast.makeText(context, "Error fetching user details: ${e.message}", Toast.LENGTH_LONG).show()
             }
-    }
-
-    private fun getChatSessionId(userId1: String, userId2: String): String {
-        val ids = listOf(userId1, userId2).sorted()
-        return "${ids[0]}_${ids[1]}"
     }
 
     override fun onDestroyView() {

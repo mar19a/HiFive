@@ -45,23 +45,32 @@ class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
                     holder.binding.name.text = user.name
                 } ?: run {
                     holder.binding.profileImage.setImageResource(R.drawable.user)
-                    holder.binding.name.text = "Unknown"
+                    holder.binding.name.text = context.getString(R.string.unknown)
                 }
             }
             .addOnFailureListener { e ->
                 Log.e("PostAdapter", "Error fetching user data", e)
                 holder.binding.profileImage.setImageResource(R.drawable.user)
-                holder.binding.name.text = "Unknown"
+                holder.binding.name.text = context.getString(R.string.unknown)
             }
 
         Glide.with(context).load(post.postUrl).placeholder(R.drawable.loading).into(holder.binding.postImage)
+        //TODO: Fix Localization / Change time display - (when the event will be?)
         holder.binding.time.text = TimeAgo.using(post.time.toLong())
-        holder.binding.csption.text = post.caption
+        holder.binding.caption.text = post.caption
 
         checkLikeStatus(post, holder)
 
         holder.binding.like.setOnClickListener {
             toggleLike(post, holder)
+        }
+
+        holder.binding.share.setOnClickListener {
+            var i = Intent(Intent.ACTION_SEND)
+            i.type = "text/plain"
+            i.putExtra(Intent.EXTRA_TEXT, postList.get(position).postUrl)
+            context.startActivity(i)
+
         }
 
         holder.binding.imageView8.setOnClickListener {
@@ -107,7 +116,7 @@ class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
         if (mapIntent.resolveActivity(context.packageManager) != null) {
             context.startActivity(mapIntent)
         } else {
-            Toast.makeText(context, "Google Maps is not installed", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.map_app_error), Toast.LENGTH_SHORT).show()
         }
     }
 }

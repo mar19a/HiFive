@@ -40,6 +40,10 @@ class PostActivity : AppCompatActivity() {
 
     private lateinit var loc: String
 
+    private var edate = ""
+
+    private var etime = ""
+
     private var etype = "Other"
 
     private var loc_enabled = false
@@ -130,11 +134,13 @@ class PostActivity : AppCompatActivity() {
             // Create a DatePickerDialog and show it when the button is clicked
             val datePickerDialog = DatePickerDialog(
                 this,
-                DatePickerDialog.OnDateSetListener { _, selectedYear, selectedMonth, selectedDay ->
+                { _, selectedYear, selectedMonth, selectedDay ->
                     // Handle the selected date
-                    val selectedDate = "$selectedDay/${selectedMonth + 1}/$selectedYear"
-                    // You can do something with the selectedDate here, such as displaying it in a TextView
+                    val selectedDate = "${selectedMonth + 1}/${selectedDay}/$selectedYear"
+
                     binding.date.text = selectedDate
+                    edate = selectedDate
+                    Log.d("PostActivity", "date:${edate}")
                 },
                 year,
                 month,
@@ -154,9 +160,10 @@ class PostActivity : AppCompatActivity() {
                 this,
                 TimePickerDialog.OnTimeSetListener { _: TimePicker, selectedHour: Int, selectedMinute: Int ->
                     // Handle the selected time
-                    val selectedTime = format12HourTime(selectedHour, selectedMinute)
                     // You can do something with the selectedTime here, such as displaying it in a TextView
-                    binding.time.text = selectedTime
+                    binding.time.text = format12HourTime(selectedHour, selectedMinute)
+                    etime = format24HourTime(selectedHour, selectedMinute)
+                    Log.d("PostActivity", "24hr time:${etime}")
                 },
                 hour,
                 minute,
@@ -189,6 +196,8 @@ class PostActivity : AppCompatActivity() {
                     postUrl = imageUrl!!, // Assign the uploaded image URL to the post
                     addr = addr,
                     loc = loc,
+                    edate = edate,
+                    etime = etime,
                     etype = binding.event.editText?.text.toString()
                 )
 
@@ -219,7 +228,12 @@ class PostActivity : AppCompatActivity() {
         calendar.set(Calendar.MINUTE, minute)
         val format = if (calendar.get(Calendar.AM_PM) == Calendar.AM) "AM" else "PM"
         val hour = if (hourOfDay % 12 == 0) 12 else hourOfDay % 12
-        return String.format(Locale.getDefault(), "%02d:%02d %s", hour, minute, format)
+        return String.format("%02d:%02d %s", hour, minute, format)
     }
+
+    private fun format24HourTime(hour: Int, minute: Int): String {
+        return String.format("%02d:%02d", hour, minute)
+    }
+    
 
 }

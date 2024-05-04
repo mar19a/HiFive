@@ -49,6 +49,7 @@ class MessageFragment : Fragment() {
 
     private fun setupRecyclerView() {
         userChatAdapter = UserChatAdapter(requireContext(), userList, arrayListOf()) { userId ->
+            Log.d("MessageFragment", "Navigating to ChatRoom with userId: $userId")
             navigateToChatRoom(userId)
         }
         binding.messagesRecyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -65,29 +66,51 @@ class MessageFragment : Fragment() {
     private fun loadUsers() {
         val currentUser = Firebase.auth.currentUser?.uid
         if (currentUser == null) {
-            Toast.makeText(context, "Not logged in", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, getString(R.string.not_logged_in), Toast.LENGTH_LONG).show()
             return
         }
 
-        // Safely constructing the collection path using the current user's UID
-        val followingCollection = currentUser + FOLLOW
-        Firebase.firestore.collection(followingCollection).get()
-            .addOnSuccessListener { documents ->
-                val tempList = ArrayList<User>()
-                val tempIds = ArrayList<String>()
-                documents.forEach { document ->
-                    document.toObject<User>()?.let { user ->
-                        tempList.add(user)
-                        tempIds.add(document.id)
-                    }
+        val followingCollection = "$currentUser$FOLLOW"
+        Firebase.firestore.collection(followingCollection)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Toast.makeText(context,
+                        getString(R.string.error_fetching_following_list, e.message), Toast.LENGTH_LONG).show()
+                    Log.e("MessageFragment", "Error fetching following list", e)
+                    return@addSnapshotListener
                 }
-                userChatAdapter.updateUsers(tempList, tempIds)
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(context, "Failed to fetch following list: ${e.message}", Toast.LENGTH_LONG).show()
-                Log.e("MessageFragment", "Error fetching following list", e)
+
+                val emails = snapshot?.documents?.mapNotNull { it.getString("email") }
+                if (emails != null && emails.isNotEmpty()) {
+                    fetchUsersByEmails(emails)
+                } else {
+                    userChatAdapter.updateUsers(emptyList(), emptyList()) // Clear the list if no following found
+                    Toast.makeText(context,
+                        getString(R.string.no_followings_found_or_missing_emails), Toast.LENGTH_SHORT).show()
+                }
             }
     }
+
+    private fun fetchUsersByEmails(emails: List<String>) {
+        Firebase.firestore.collection(USER_NODE)
+            .whereIn("email", emails)
+            .addSnapshotListener { querySnapshot, e ->
+                if (e != null) {
+                    Toast.makeText(context, "Error fetching user details: ${e.message}", Toast.LENGTH_LONG).show()
+                    Log.e("MessageFragment", "Error fetching user details", e)
+                    return@addSnapshotListener
+                }
+
+                val userList = querySnapshot?.documents?.mapNotNull { doc ->
+                    doc.toObject(User::class.java)?.apply { uid = doc.id }
+                } ?: listOf()
+
+                val userIds = userList.mapNotNull { it.uid }
+                userChatAdapter.updateUsers(userList, userIds)
+                Log.d("MessageFragment", "Loaded users and IDs: $userIds")
+            }
+    }
+
 
 
 

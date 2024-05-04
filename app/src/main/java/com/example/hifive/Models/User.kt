@@ -1,6 +1,7 @@
 package com.example.hifive.Models
 
 class User {
+    var uid: String? = null
     var image:String?=null
     var name:String?=null
     var email:String?=null
