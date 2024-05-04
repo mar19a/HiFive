@@ -68,4 +68,6 @@
     <string name="incomplete_form_message">Please Fill All The Details</string>
     <string name="failed_to_fetch_user_data">Failed to fetch user data.</string>
     <string name="update_profile_button">Update Profile</string>
+    <string name="no_address_found">No address found for the location</string>
+    <string name="address_error">Error getting address</string>
 </resources>
