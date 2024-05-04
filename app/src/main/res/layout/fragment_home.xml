@@ -12,7 +12,6 @@
         style="@style/Base.Theme.HiFive"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
         android:visibility="visible"
@@ -20,7 +19,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
 
-        app:title="HiFive"
+        app:title="@string/app_name"
         app:titleMarginStart="30dp" />
 
     <androidx.core.widget.NestedScrollView
