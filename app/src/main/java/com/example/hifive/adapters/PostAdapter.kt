@@ -55,8 +55,9 @@ class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
             }
 
         Glide.with(context).load(post.postUrl).placeholder(R.drawable.loading).into(holder.binding.postImage)
+        //TODO: Fix Localization / Change time display - (when the event will be?)
         holder.binding.time.text = TimeAgo.using(post.time.toLong())
-        holder.binding.csption.text = post.caption
+        holder.binding.caption.text = post.caption
 
         checkLikeStatus(post, holder)
 
