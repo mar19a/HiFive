@@ -55,11 +55,14 @@
 
     <!-- Strings used for add user UI -->
     <string name="searching_text">Searching For Nearby Users…</string>
-    <string name="connected_text">Nearby User Found!</string>
+    <string name="connected_text">Shake To Send User Data!</string>
 
     <string name="title_activity_maps">MapsActivity</string>
     <string name="send_user_data">Send User Data</string>
     <string name="scan_qr_code">Scan QR Code</string>
     <string name="qr_code_description">QR Code Containing User Information</string>
     <string name="invalid_scan">Scan Cancelled</string>
+    <string name="disconnect_text">Disconnected</string>
+    <string name="connected_to_text">Connected to</string>
+    <string name="user_data_sent">User Data Sent!</string>
 </resources>

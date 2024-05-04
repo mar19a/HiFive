@@ -41,7 +41,7 @@ class AddUserActivity : ConnectionsActivity() {
     //Only other activities with the same service id can communicate
     private val SERVICE_ID = "HiFive"
     //Identification of the user's endpoint for communication
-    //private var myName = "get user's name and put it here"
+    private var myName = "get user's name and put it here"
 
     private var mState = State.UNKNOWN
 
@@ -82,6 +82,7 @@ class AddUserActivity : ConnectionsActivity() {
         qrFrame = findViewById(R.id.testQr)
 
         UUID = FirebaseAuth.getInstance().currentUser!!.uid
+        myName = FirebaseAuth.getInstance().currentUser!!.displayName!!
 
         //Generate QR Code encoding UUID
         Picasso.get().load("https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="+UUID).into(qrFrame)
@@ -94,7 +95,7 @@ class AddUserActivity : ConnectionsActivity() {
         sendIdButton.setOnClickListener{
             //Log.d("Check UUID", UUID)
             send(Payload.fromBytes(UUID.toByteArray(Charsets.UTF_8)))
-            Toast.makeText(applicationContext, "User Data Sent!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext, getString(R.string.user_data_sent), Toast.LENGTH_SHORT).show()
 
         }
 
@@ -185,7 +186,8 @@ class AddUserActivity : ConnectionsActivity() {
                 //Log.d("Sensors","Shake Detected")
                 if(mState == State.CONNECTED){
                     send(Payload.fromBytes(UUID.toByteArray(Charsets.UTF_8)))
-                    Toast.makeText(applicationContext, "User Data Sent!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(applicationContext,
+                        getString(R.string.user_data_sent), Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -214,7 +216,7 @@ class AddUserActivity : ConnectionsActivity() {
     }
 
     //Required Getters for Class implementation
-    override fun getName(): String { return UUID }
+    override fun getName(): String { return myName }
     override fun getServiceId(): String { return SERVICE_ID }
     override fun getStrategy(): Strategy { return STRATEGY }
 
@@ -231,12 +233,13 @@ class AddUserActivity : ConnectionsActivity() {
     }
 
     override fun onEndpointConnected(endpoint: Endpoint?) {
-        Toast.makeText(this, "Connected to" + endpoint?.name, Toast.LENGTH_SHORT).show()
+        Toast.makeText(this,
+            getString(R.string.connected_to_text) + endpoint?.name, Toast.LENGTH_SHORT).show()
         setState(State.CONNECTED)
     }
 
     override fun onEndpointDisconnected(endpoint: Endpoint?) {
-        Toast.makeText(this, "Disconnected", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.disconnect_text), Toast.LENGTH_SHORT).show()
         setState(State.SEARCHING)
     }
 
@@ -257,13 +260,13 @@ class AddUserActivity : ConnectionsActivity() {
         //Change Nearby Connections behavior to new state
         when(newState){
             State.SEARCHING -> {
-                addUserText.text = "Searching For Nearby Users..."
+                addUserText.text = getString(R.string.searching_text)
                 disconnectFromAllEndpoints()
                 startDiscovering()
                 startAdvertising()
             }
             State.CONNECTED -> {
-                addUserText.text = "Nearby User Found!"
+                addUserText.text = getString(R.string.connected_text)
                 stopDiscovering()
                 stopAdvertising()
             }
