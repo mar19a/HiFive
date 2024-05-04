@@ -41,4 +41,11 @@
     <string name="my_post">나의 포스트</string>
     <string name="my_likes">나의 라이크</string>
     <string name="add_post">포스트 만들기</string>
+    <string name="name">이름</string>
+    <string name="email">이매일</string>
+    <string name="password">비밀번호</string>
+    <string name="register">등록</string>
+    <string name="already_have_an_account">어카운트 있으세요?</string>
+    <string name="login">로그인</string>
+    <string name="create_new_account">어카운트 만들기</string>
 </resources>
