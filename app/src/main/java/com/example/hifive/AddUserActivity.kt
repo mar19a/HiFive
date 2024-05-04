@@ -40,8 +40,8 @@ class AddUserActivity : ConnectionsActivity() {
     private lateinit var rv : RecyclerView
 
     private lateinit var addUserText : TextView
-    private lateinit var userIDText : TextView
-    private lateinit var connectedIDText : TextView
+    //lateinit var userIDText : TextView
+    //private lateinit var connectedIDText : TextView
 
     private lateinit var UUID : String
 
@@ -60,9 +60,9 @@ class AddUserActivity : ConnectionsActivity() {
         //myName = getRandomString(8)
 
         addUserText = findViewById(R.id.addUserDialog)
-        userIDText = findViewById(R.id.debugUserID)
+        //userIDText = findViewById(R.id.debugUserID)
 
-        connectedIDText = findViewById(R.id.debugConnectedID)
+        //connectedIDText = findViewById(R.id.debugConnectedID)
         qrFrame = findViewById(R.id.testQr)
 
         UUID = FirebaseAuth.getInstance().currentUser!!.uid
@@ -72,11 +72,11 @@ class AddUserActivity : ConnectionsActivity() {
 
 
         //Debug TextView (To remove)
-        userIDText.text = "UUID: " + myName
+        //userIDText.text = "UUID: " + myName
 
         sendIdButton = findViewById(R.id.sendIDButton)
         sendIdButton.setOnClickListener{
-            Log.d("Check UUID", UUID)
+            //Log.d("Check UUID", UUID)
             send(Payload.fromBytes(UUID.toByteArray(Charsets.UTF_8)))
 
         }
@@ -96,7 +96,7 @@ class AddUserActivity : ConnectionsActivity() {
         val integrator = IntentIntegrator(this)
         integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
         integrator.setOrientationLocked(false)
-        integrator.setPrompt("Scan a QR code")
+        integrator.setPrompt("")
         integrator.initiateScan()
     }
 
@@ -115,11 +115,11 @@ class AddUserActivity : ConnectionsActivity() {
                         if (i.id == Firebase.auth.currentUser!!.uid) {
 
                         } else {
-                            Log.d("iterated user id", i.id)
+                            //Log.d("iterated user id", i.id)
 
                             if (result.contents == i.id) {
                                 //Check if payload is ever caught
-                                Log.d("debug query", "test query matched")
+                                //Log.d("debug query", "test query matched")
                                 var user: User = i.toObject<User>()!!
 
                                 tempList.add(user)
@@ -137,12 +137,14 @@ class AddUserActivity : ConnectionsActivity() {
         }
     }
 
-    private fun getRandomString(length: Int) : String {
+    //Temporary Debug Function
+    /*private fun getRandomString(length: Int) : String {
         val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
         return (1..length)
             .map { allowedChars.random() }
             .joinToString("")
     }
+    */
 
     override fun onStart(){
         super.onStart()
@@ -225,7 +227,7 @@ class AddUserActivity : ConnectionsActivity() {
 
     override fun onReceive(endpoint: Endpoint?, payload: Payload?) {
         if (payload!!.type == Payload.Type.BYTES) {
-            connectedIDText.text = payload.asBytes()!!.toString(Charsets.UTF_8)
+            val otherUserID = payload.asBytes()!!.toString(Charsets.UTF_8)
             //TODO: Parse Bytes Here And Display Follow RV for User
             Firebase.firestore.collection(USER_NODE).get().addOnSuccessListener {
                 //Debug Statement
@@ -239,12 +241,12 @@ class AddUserActivity : ConnectionsActivity() {
                     if (i.id == Firebase.auth.currentUser!!.uid) {
 
                     } else {
-                        Log.d("iterated user id", i.id)
+                        //Log.d("iterated user id", i.id)
 
-                        if (connectedIDText.text == i.id) {
+                        if (otherUserID == i.id) {
                             //Check if payload is ever caught
-                            Log.d("debug query", "test query matched")
-                            var user: User = i.toObject<User>()!!
+                            //Log.d("debug query", "test query matched")
+                            val user: User = i.toObject<User>()!!
 
                             tempList.add(user)
                         }
