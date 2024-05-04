@@ -52,8 +52,8 @@ class ProfileFragment : Fragment() {
 
     private fun setupViewPager() {
         viewPagerAdapter = ViewPagerAdapter(childFragmentManager)
-        viewPagerAdapter.addFragments(MyPostFragment(), "My Post")
-        viewPagerAdapter.addFragments(MyLikesFragment(), "My Likes") // Assuming you rename or repurpose MyReelsFragment
+        viewPagerAdapter.addFragments(MyPostFragment(), getString(R.string.my_post))
+        viewPagerAdapter.addFragments(MyLikesFragment(), getString(R.string.my_likes)) // Assuming you rename or repurpose MyReelsFragment
         binding.viewPager.adapter = viewPagerAdapter
         binding.tabLayout.setupWithViewPager(binding.viewPager)
     }
