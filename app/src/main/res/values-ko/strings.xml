@@ -48,4 +48,5 @@
     <string name="already_have_an_account">어카운트 있으세요?</string>
     <string name="login">로그인</string>
     <string name="create_new_account">어카운트 만들기</string>
+    <string name="confirm_location">위치 화긴</string>
 </resources>

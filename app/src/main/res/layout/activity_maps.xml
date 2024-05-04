@@ -21,7 +21,7 @@
         android:id="@+id/send"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Confirm Location"
+        android:text="@string/confirm_location"
         android:layout_margin="20dp"
         android:enabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
