@@ -182,7 +182,7 @@ class AddUserActivity : ConnectionsActivity() {
             acceleration = acceleration * 0.9f + delta
 
             //"On Shake Function"
-            if (acceleration > 11) {
+            if (acceleration > 11.5) {
                 //Log.d("Sensors","Shake Detected")
                 if(mState == State.CONNECTED){
                     send(Payload.fromBytes(UUID.toByteArray(Charsets.UTF_8)))
