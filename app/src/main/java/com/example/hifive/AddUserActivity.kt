@@ -1,7 +1,14 @@
 package com.example.hifive
 
+import android.content.Context
 import android.content.Intent
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
+import android.net.Uri
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
@@ -22,6 +29,9 @@ import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.google.zxing.integration.android.IntentIntegrator
 import com.squareup.picasso.Picasso
+import java.util.Objects
+import kotlin.math.sqrt
+import kotlin.random.Random
 
 
 class AddUserActivity : ConnectionsActivity() {
@@ -31,7 +41,7 @@ class AddUserActivity : ConnectionsActivity() {
     //Only other activities with the same service id can communicate
     private val SERVICE_ID = "HiFive"
     //Identification of the user's endpoint for communication
-    private var myName = "get user's name and put it here"
+    //private var myName = "get user's name and put it here"
 
     private var mState = State.UNKNOWN
 
@@ -51,6 +61,12 @@ class AddUserActivity : ConnectionsActivity() {
 
     private lateinit var scanQRButton : Button
 
+    //Variables for motion detection
+    private var sensorManager: SensorManager? = null
+    private var acceleration = 0f
+    private var currentAcceleration = 0f
+    private var lastAcceleration = 0f
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -66,9 +82,9 @@ class AddUserActivity : ConnectionsActivity() {
         qrFrame = findViewById(R.id.testQr)
 
         UUID = FirebaseAuth.getInstance().currentUser!!.uid
-        myName = UUID
 
-        Picasso.get().load("https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="+myName).into(qrFrame)
+        //Generate QR Code encoding UUID
+        Picasso.get().load("https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="+UUID).into(qrFrame)
 
 
         //Debug TextView (To remove)
@@ -78,6 +94,7 @@ class AddUserActivity : ConnectionsActivity() {
         sendIdButton.setOnClickListener{
             //Log.d("Check UUID", UUID)
             send(Payload.fromBytes(UUID.toByteArray(Charsets.UTF_8)))
+            Toast.makeText(applicationContext, "User Data Sent!", Toast.LENGTH_SHORT).show()
 
         }
 
@@ -90,8 +107,20 @@ class AddUserActivity : ConnectionsActivity() {
         rv = findViewById(R.id.recyclerView)
         rv.layoutManager = LinearLayoutManager(applicationContext)
         rv.adapter = adapter
+
+        //Initialize Sensor Manager
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        Objects.requireNonNull(sensorManager)!!
+            .registerListener(sensorListener, sensorManager!!
+                .getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL)
+
+        acceleration = 10f
+        currentAcceleration = SensorManager.GRAVITY_EARTH
+        lastAcceleration = SensorManager.GRAVITY_EARTH
+
     }
 
+    //Wrapper function to initiate a scan activity from the ZXing library
     private fun initQRCodeScanner() {
         val integrator = IntentIntegrator(this)
         integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
@@ -100,11 +129,12 @@ class AddUserActivity : ConnectionsActivity() {
         integrator.initiateScan()
     }
 
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
         if (result != null) {
             if (result.contents == null) {
-                Toast.makeText(this, "Scan cancelled", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, getString(R.string.invalid_scan), Toast.LENGTH_LONG).show()
             } else {
                 Firebase.firestore.collection(USER_NODE).get().addOnSuccessListener {
 
@@ -137,6 +167,31 @@ class AddUserActivity : ConnectionsActivity() {
         }
     }
 
+    //Implementation for SensorEventListener to detect shaking
+    private val sensorListener: SensorEventListener = object : SensorEventListener {
+        override fun onSensorChanged(event: SensorEvent) {
+
+            val x = event.values[0]
+            val y = event.values[1]
+            val z = event.values[2]
+            lastAcceleration = currentAcceleration
+
+            currentAcceleration = sqrt((x * x + y * y + z * z).toDouble()).toFloat()
+            val delta: Float = currentAcceleration - lastAcceleration
+            acceleration = acceleration * 0.9f + delta
+
+            //"On Shake Function"
+            if (acceleration > 11) {
+                //Log.d("Sensors","Shake Detected")
+                if(mState == State.CONNECTED){
+                    send(Payload.fromBytes(UUID.toByteArray(Charsets.UTF_8)))
+                    Toast.makeText(applicationContext, "User Data Sent!", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
+    }
+
     //Temporary Debug Function
     /*private fun getRandomString(length: Int) : String {
         val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
@@ -152,8 +207,14 @@ class AddUserActivity : ConnectionsActivity() {
         setState(State.SEARCHING)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        setState(State.UNKNOWN)
+        disconnectFromAllEndpoints()
+    }
+
     //Required Getters for Class implementation
-    override fun getName(): String { return myName }
+    override fun getName(): String { return UUID }
     override fun getServiceId(): String { return SERVICE_ID }
     override fun getStrategy(): Strategy { return STRATEGY }
 

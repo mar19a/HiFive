@@ -54,11 +54,12 @@
     <string name="error_missing_permissions">Cannot start without required permissions</string>
 
     <!-- Strings used for add user UI -->
-    <string name="searching_text">Searching For Nearby Users...</string>
+    <string name="searching_text">Searching For Nearby Users…</string>
     <string name="connected_text">Nearby User Found!</string>
 
     <string name="title_activity_maps">MapsActivity</string>
     <string name="send_user_data">Send User Data</string>
     <string name="scan_qr_code">Scan QR Code</string>
     <string name="qr_code_description">QR Code Containing User Information</string>
+    <string name="invalid_scan">Scan Cancelled</string>
 </resources>
