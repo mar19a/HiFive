@@ -86,4 +86,11 @@
     <string name="my_post">My Post</string>
     <string name="my_likes">My Likes</string>
     <string name="add_post">Add Post</string>
+    <string name="name">name</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="register">Register</string>
+    <string name="already_have_an_account">Already have an Account?</string>
+    <string name="login">Login</string>
+    <string name="create_new_account">Create New Account</string>
 </resources>

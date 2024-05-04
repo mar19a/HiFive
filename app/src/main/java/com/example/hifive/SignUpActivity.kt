@@ -41,7 +41,7 @@ class SignUpActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        val text = "<font color=#FF000000>Already have an Account</font> <font color=#1E88E5>Login ?</font>"
+        val text = "<font color=#FF000000>"+getString(R.string.already_have_an_account)+"</font> <font color=#1E88E5>"+getString(R.string.login)+"</font>"
         binding.login.text = Html.fromHtml(text)
 
         user = User()
