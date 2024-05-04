@@ -1,31 +1,27 @@
 package com.example.hifive
 
-import com.google.android.gms.nearby.connection.Strategy
-import android.Manifest
-import android.animation.Animator
+import android.content.Intent
 import android.os.Bundle
-import android.os.Build
 import android.util.Log
-import com.google.android.gms.nearby.connection.Payload
-import com.google.android.gms.nearby.connection.ConnectionInfo
-import kotlin.random.Random
-import android.widget.Toast
-import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hifive.Models.User
-import com.google.firebase.auth.FirebaseAuth
-import com.squareup.picasso.Picasso
 import com.example.hifive.adapters.SearchAdapter
 import com.example.hifive.utils.USER_NODE
+import com.google.android.gms.nearby.connection.ConnectionInfo
+import com.google.android.gms.nearby.connection.Payload
+import com.google.android.gms.nearby.connection.Strategy
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
+import com.google.zxing.integration.android.IntentIntegrator
+import com.squareup.picasso.Picasso
 
 
 class AddUserActivity : ConnectionsActivity() {
@@ -86,12 +82,59 @@ class AddUserActivity : ConnectionsActivity() {
         }
 
         scanQRButton = findViewById(R.id.scanQRButton)
-
+        scanQRButton.setOnClickListener {
+            initQRCodeScanner()
+        }
 
         adapter = SearchAdapter(applicationContext, userList)
         rv = findViewById(R.id.recyclerView)
         rv.layoutManager = LinearLayoutManager(applicationContext)
         rv.adapter = adapter
+    }
+
+    private fun initQRCodeScanner() {
+        val integrator = IntentIntegrator(this)
+        integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
+        integrator.setOrientationLocked(false)
+        integrator.setPrompt("Scan a QR code")
+        integrator.initiateScan()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
+        if (result != null) {
+            if (result.contents == null) {
+                Toast.makeText(this, "Scan cancelled", Toast.LENGTH_LONG).show()
+            } else {
+                Firebase.firestore.collection(USER_NODE).get().addOnSuccessListener {
+
+                    var tempList = ArrayList<User>()
+                    userList.clear()
+                    for (i in it.documents) {
+
+                        if (i.id == Firebase.auth.currentUser!!.uid) {
+
+                        } else {
+                            Log.d("iterated user id", i.id)
+
+                            if (result.contents == i.id) {
+                                //Check if payload is ever caught
+                                Log.d("debug query", "test query matched")
+                                var user: User = i.toObject<User>()!!
+
+                                tempList.add(user)
+                            }
+                        }
+
+                    }
+
+                    userList.addAll(tempList)
+                    adapter.notifyDataSetChanged()
+                }
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data)
+        }
     }
 
     private fun getRandomString(length: Int) : String {
@@ -187,7 +230,7 @@ class AddUserActivity : ConnectionsActivity() {
             Firebase.firestore.collection(USER_NODE).get().addOnSuccessListener {
                 //Debug Statement
                 //Log.d("firebase debug", "payload received, OnSuccess called")
-                Log.d("firebase debug", "Payload:" + payload.asBytes()!!.toString(Charsets.UTF_8))
+                //Log.d("firebase debug", "Payload:" + payload.asBytes()!!.toString(Charsets.UTF_8))
 
                 var tempList = ArrayList<User>()
                 userList.clear()
