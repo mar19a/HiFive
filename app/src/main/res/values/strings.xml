@@ -79,4 +79,8 @@
     <string name="error_fetching_following_list">Error fetching following list: %1$s</string>
     <string name="no_followings_found_or_missing_emails">No followings found or missing emails.</string>
     <string name="not_logged_in">Not logged in</string>
+    <string name="unknown">Unknown</string>
+    <string name="add_nearby_users_button">Add Nearby Users</string>
+    <string name="edit_profile_button">Edit Profile</string>
+    <string name="logout">Logout</string>
 </resources>

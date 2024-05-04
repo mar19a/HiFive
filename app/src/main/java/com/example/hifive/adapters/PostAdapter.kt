@@ -45,13 +45,13 @@ class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
                     holder.binding.name.text = user.name
                 } ?: run {
                     holder.binding.profileImage.setImageResource(R.drawable.user)
-                    holder.binding.name.text = "Unknown"
+                    holder.binding.name.text = context.getString(R.string.unknown)
                 }
             }
             .addOnFailureListener { e ->
                 Log.e("PostAdapter", "Error fetching user data", e)
                 holder.binding.profileImage.setImageResource(R.drawable.user)
-                holder.binding.name.text = "Unknown"
+                holder.binding.name.text = context.getString(R.string.unknown)
             }
 
         Glide.with(context).load(post.postUrl).placeholder(R.drawable.loading).into(holder.binding.postImage)
