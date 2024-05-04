@@ -40,4 +40,5 @@
     <string name="logout">로그 아웃</string>
     <string name="my_post">나의 포스트</string>
     <string name="my_likes">나의 라이크</string>
+    <string name="add_post">포스트 만들기</string>
 </resources>

@@ -85,4 +85,5 @@
     <string name="logout">Logout</string>
     <string name="my_post">My Post</string>
     <string name="my_likes">My Likes</string>
+    <string name="add_post">Add Post</string>
 </resources>
