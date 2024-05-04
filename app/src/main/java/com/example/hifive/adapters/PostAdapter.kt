@@ -115,7 +115,7 @@ class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
         if (mapIntent.resolveActivity(context.packageManager) != null) {
             context.startActivity(mapIntent)
         } else {
-            Toast.makeText(context, "Google Maps is not installed", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.map_app_error), Toast.LENGTH_SHORT).show()
         }
     }
 }

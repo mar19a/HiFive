@@ -39,7 +39,7 @@ class SearchAdapter(var context: Context, var userList: ArrayList<User>) :
                 if (it.documents.size==0){
                         isfollow=false
                 }else{
-                    holder.binding.follow.text="Unfollow"
+                    holder.binding.follow.text= context.getString(R.string.unfollow)
                     isfollow=true
                 }
 
@@ -50,14 +50,14 @@ class SearchAdapter(var context: Context, var userList: ArrayList<User>) :
                     .whereEqualTo("email", userList.get(position).email).get().addOnSuccessListener {
 
                        Firebase.firestore.collection(Firebase.auth.currentUser!!.uid+ FOLLOW).document(it.documents.get(0).id).delete()
-                        holder.binding.follow.text="follow"
+                        holder.binding.follow.text= context.getString(R.string.follow)
                         isfollow=false
 
                     }
             }else{
                 Firebase.firestore.collection(Firebase.auth.currentUser!!.uid + FOLLOW).document()
                     .set(userList.get(position))
-                holder.binding.follow.text = "Unfollow"
+                holder.binding.follow.text = context.getString(R.string.unfollow)
                 isfollow=true
             }
 

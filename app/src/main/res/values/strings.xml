@@ -70,4 +70,13 @@
     <string name="update_profile_button">Update Profile</string>
     <string name="no_address_found">No address found for the location</string>
     <string name="address_error">Error getting address</string>
+    <string name="map_app_error">No Map App Installed</string>
+    <string name="unfollow">Unfollow</string>
+    <string name="follow">Follow</string>
+    <string name="user_data_not_found_please_complete_your_profile">User data not found. Please complete your profile.</string>
+    <string name="error_starting_activity_please_try_again_later">Error starting activity. Please try again later.</string>
+    <string name="not_logged_in_error">You must be logged in to view this page. Redirecting to login...</string>
+    <string name="error_fetching_following_list">Error fetching following list: %1$s</string>
+    <string name="no_followings_found_or_missing_emails">No followings found or missing emails.</string>
+    <string name="not_logged_in">Not logged in</string>
 </resources>

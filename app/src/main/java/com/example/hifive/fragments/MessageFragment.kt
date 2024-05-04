@@ -66,7 +66,7 @@ class MessageFragment : Fragment() {
     private fun loadUsers() {
         val currentUser = Firebase.auth.currentUser?.uid
         if (currentUser == null) {
-            Toast.makeText(context, "Not logged in", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, getString(R.string.not_logged_in), Toast.LENGTH_LONG).show()
             return
         }
 
@@ -74,7 +74,8 @@ class MessageFragment : Fragment() {
         Firebase.firestore.collection(followingCollection)
             .addSnapshotListener { snapshot, e ->
                 if (e != null) {
-                    Toast.makeText(context, "Error fetching following list: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context,
+                        getString(R.string.error_fetching_following_list, e.message), Toast.LENGTH_LONG).show()
                     Log.e("MessageFragment", "Error fetching following list", e)
                     return@addSnapshotListener
                 }
@@ -84,7 +85,8 @@ class MessageFragment : Fragment() {
                     fetchUsersByEmails(emails)
                 } else {
                     userChatAdapter.updateUsers(emptyList(), emptyList()) // Clear the list if no following found
-                    Toast.makeText(context, "No followings found or missing emails.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,
+                        getString(R.string.no_followings_found_or_missing_emails), Toast.LENGTH_SHORT).show()
                 }
             }
     }
