@@ -65,4 +65,7 @@
     <string name="disconnect_text">Disconnected</string>
     <string name="connected_to_text">Connected to</string>
     <string name="user_data_sent">User Data Sent!</string>
+    <string name="incomplete_form_message">Please Fill All The Details</string>
+    <string name="failed_to_fetch_user_data">Failed to fetch user data.</string>
+    <string name="update_profile_button">Update Profile</string>
 </resources>

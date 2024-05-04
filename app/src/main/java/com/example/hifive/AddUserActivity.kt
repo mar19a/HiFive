@@ -292,7 +292,6 @@ class AddUserActivity : ConnectionsActivity() {
     override fun onReceive(endpoint: Endpoint?, payload: Payload?) {
         if (payload!!.type == Payload.Type.BYTES) {
             val otherUserID = payload.asBytes()!!.toString(Charsets.UTF_8)
-            //TODO: Parse Bytes Here And Display Follow RV for User
             Firebase.firestore.collection(USER_NODE).get().addOnSuccessListener {
                 //Debug Statement
                 //Log.d("firebase debug", "payload received, OnSuccess called")
