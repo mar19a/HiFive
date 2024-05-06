@@ -21,17 +21,76 @@ import com.example.hifive.utils.USER_NODE
 import com.google.firebase.auth.ktx.auth
 import java.text.SimpleDateFormat
 import java.util.Locale
+import android.view.View
+import androidx.recyclerview.widget.LinearLayoutManager
 
 
 class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
     RecyclerView.Adapter<PostAdapter.MyHolder>() {
 
     inner class MyHolder(var binding: PostRvBinding) : RecyclerView.ViewHolder(binding.root) {
+        var commentAdapter: CommentAdapter? = null
+
         init {
+            commentAdapter = CommentAdapter(listOf())
+            binding.commentsRecyclerView.adapter = commentAdapter
+            binding.commentsRecyclerView.layoutManager = LinearLayoutManager(context)
+
             binding.eventAddress.setOnClickListener {
                 val address = postList[adapterPosition].eventAddr
                 openGoogleMaps(address)
             }
+            binding.commentToggle.setOnClickListener {
+                if (binding.commentsSection.visibility == View.VISIBLE) {
+                    binding.commentsSection.visibility = View.GONE
+                } else {
+                    binding.commentsSection.visibility = View.VISIBLE
+                    loadComments(postList[adapterPosition].postId)
+                }
+            }
+            binding.submitCommentButton.setOnClickListener {
+                val commentText = binding.commentInput.text.toString()
+                if (commentText.isNotEmpty()) {
+                    submitComment(commentText, postList[adapterPosition].postId)
+                    binding.commentInput.setText("")
+                }
+            }
+        }
+
+
+        fun loadComments(postId: String) {
+            Firebase.firestore.collection("posts").document(postId)
+                .collection("comments")
+                .orderBy("timestamp")
+                .addSnapshotListener { snapshot, e ->
+                    if (e != null) {
+                        Toast.makeText(context, "Error loading comments: ${e.message}", Toast.LENGTH_LONG).show()
+                        return@addSnapshotListener
+                    }
+                    val comments = snapshot?.documents?.mapNotNull { it.toObject(Post.Comment::class.java) }
+                    commentAdapter?.updateComments(comments ?: listOf())
+                }
+        }
+    }
+
+    private fun submitComment(commentText: String, postId: String) {
+        val currentUser = Firebase.auth.currentUser
+        if (currentUser != null) {
+            val comment = hashMapOf(
+                "userId" to currentUser.uid,
+                "text" to commentText,
+                "timestamp" to System.currentTimeMillis()
+            )
+            Firebase.firestore.collection("posts").document(postId)
+                .collection("comments").add(comment)
+                .addOnSuccessListener {
+                    Toast.makeText(context, "Comment added successfully", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(context, "Failed to add comment: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+        } else {
+            Toast.makeText(context, "You need to be logged in to comment.", Toast.LENGTH_LONG).show()
         }
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyHolder {
@@ -44,6 +103,7 @@ class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
 
         val post = postList[position]
+        holder.commentAdapter?.updateComments(listOf())
         holder.binding.eventAddress.text = post.eventAddr
 
         Firebase.firestore.collection(USER_NODE).document(post.uid).get()
@@ -110,18 +170,10 @@ class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
         }
     }
     private fun formatDateTime(holder: MyHolder, date: String, time: String) {
-        try {
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-            val newDateFormat = SimpleDateFormat("MMM dd, yyyy h:mm a", Locale.getDefault())
-            val fullDate = "$date $time"
-            val parsedDate = dateFormat.parse(fullDate)
-            val formattedDate = newDateFormat.format(parsedDate)
-            holder.binding.eventDate.text = formattedDate
-        } catch (e: Exception) {
-            Log.e("PostAdapter", "Error formatting date/time", e)
+
             holder.binding.eventDate.text = "$date $time"
         }
-    }
+
     private fun checkLikeStatus(post: Post, holder: MyHolder) {
         val userId = Firebase.auth.currentUser?.uid ?: return
         Firebase.firestore.collection("userLikes").document(userId).collection("likes")
