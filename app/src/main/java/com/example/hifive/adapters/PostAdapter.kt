@@ -19,13 +19,21 @@ import com.example.hifive.R
 import com.example.hifive.databinding.PostRvBinding
 import com.example.hifive.utils.USER_NODE
 import com.google.firebase.auth.ktx.auth
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
     RecyclerView.Adapter<PostAdapter.MyHolder>() {
 
-    inner class MyHolder(var binding: PostRvBinding) : RecyclerView.ViewHolder(binding.root)
-
+    inner class MyHolder(var binding: PostRvBinding) : RecyclerView.ViewHolder(binding.root) {
+        init {
+            binding.eventAddress.setOnClickListener {
+                val address = postList[adapterPosition].eventAddr
+                openGoogleMaps(address)
+            }
+        }
+    }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyHolder {
         val binding = PostRvBinding.inflate(LayoutInflater.from(context), parent, false)
         return MyHolder(binding)
@@ -34,7 +42,9 @@ class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
     override fun getItemCount(): Int = postList.size
 
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
+
         val post = postList[position]
+        holder.binding.eventAddress.text = post.eventAddr
 
         Firebase.firestore.collection(USER_NODE).document(post.uid).get()
             .addOnSuccessListener { documentSnapshot ->
@@ -55,9 +65,20 @@ class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
             }
 
         Glide.with(context).load(post.postUrl).placeholder(R.drawable.loading).into(holder.binding.postImage)
-        //TODO: Fix Localization / Change time display - (when the event will be?)
-        holder.binding.time.text = TimeAgo.using(post.time.toLong())
         holder.binding.caption.text = post.caption
+        holder.binding.time.text = TimeAgo.using(post.time.toLong())
+
+        // Format and display date and time together
+        formatDateTime(holder, post.eventDate, post.eventTime)
+
+        holder.binding.eventAddress.text = post.eventAddr
+        holder.binding.eventAddress.setOnClickListener {
+            openGoogleMapsForDirections(post.eventLoc)
+        }
+
+        holder.binding.imageView8.setOnClickListener {
+            openGoogleMapsForDirections(post.eventLoc)
+        }
 
         checkLikeStatus(post, holder)
 
@@ -78,6 +99,29 @@ class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
         }
     }
 
+    private fun openGoogleMaps(address: String) {
+        val uri = Uri.parse("geo:0,0?q=${Uri.encode(address)}")
+        val intent = Intent(Intent.ACTION_VIEW, uri)
+        intent.setPackage("com.google.android.apps.maps")
+        if (intent.resolveActivity(context.packageManager) != null) {
+            context.startActivity(intent)
+        } else {
+            Toast.makeText(context, "Google Maps is not installed", Toast.LENGTH_SHORT).show()
+        }
+    }
+    private fun formatDateTime(holder: MyHolder, date: String, time: String) {
+        try {
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val newDateFormat = SimpleDateFormat("MMM dd, yyyy h:mm a", Locale.getDefault())
+            val fullDate = "$date $time"
+            val parsedDate = dateFormat.parse(fullDate)
+            val formattedDate = newDateFormat.format(parsedDate)
+            holder.binding.eventDate.text = formattedDate
+        } catch (e: Exception) {
+            Log.e("PostAdapter", "Error formatting date/time", e)
+            holder.binding.eventDate.text = "$date $time"
+        }
+    }
     private fun checkLikeStatus(post: Post, holder: MyHolder) {
         val userId = Firebase.auth.currentUser?.uid ?: return
         Firebase.firestore.collection("userLikes").document(userId).collection("likes")
