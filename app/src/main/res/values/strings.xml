@@ -1,19 +1,19 @@
 <resources>
     <string name="app_name">HiFive</string>
-    <string name="title_activity_home">HomeActivity</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
-    <string name="title_activity_login">LoginActivity</string>
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
+    <string name="title_activity_home" translatable="false">HomeActivity</string>
+    <string name="title_home" translatable="false">Home</string>
+    <string name="title_dashboard" translatable="false">Dashboard</string>
+    <string name="title_notifications" translatable="false">Notifications</string>
+    <string name="title_activity_login" translatable="false">LoginActivity</string>
+    <string name="first_fragment_label" translatable="false">First Fragment</string>
+    <string name="second_fragment_label" translatable="false">Second Fragment</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
     <string name="back">Back</string>
     <string name= "type_message">Type Message</string>
     <string name= "send">Send</string>
 
-    <string name="lorem_ipsum">
+    <string name="lorem_ipsum" translatable="false">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
         volutpat, dolor id interdum ullamcorper, risus dolor egestas lectus, sit amet mattis purus
         dui nec risus. Maecenas non sodales nisi, vel dictum dolor. Class aptent taciti sociosqu ad
@@ -50,12 +50,47 @@
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
     <string name="error_missing_permissions">Cannot start without required permissions</string>
 
     <!-- Strings used for add user UI -->
-    <string name="searching_text">Searching For Nearby Users...</string>
-    <string name="connected_text">Nearby User Found!</string>
+    <string name="searching_text">Searching For Nearby Users…</string>
+    <string name="connected_text">Shake To Send User Data!</string>
 
-    <string name="title_activity_maps">MapsActivity</string>
+    <string name="title_activity_maps" translatable="false">MapsActivity</string>
+    <string name="send_user_data">Send User Data</string>
+    <string name="scan_qr_code">Scan QR Code</string>
+    <string name="qr_code_description">QR Code Containing User Information</string>
+    <string name="invalid_scan">Scan Cancelled</string>
+    <string name="disconnect_text">Disconnected</string>
+    <string name="connected_to_text">Connected to</string>
+    <string name="user_data_sent">User Data Sent!</string>
+    <string name="incomplete_form_message">Please Fill All The Details</string>
+    <string name="failed_to_fetch_user_data">Failed to fetch user data.</string>
+    <string name="update_profile_button">Update Profile</string>
+    <string name="no_address_found">No address found for the location</string>
+    <string name="address_error">Error getting address</string>
+    <string name="map_app_error">No Map App Installed</string>
+    <string name="unfollow">Unfollow</string>
+    <string name="follow">Follow</string>
+    <string name="user_data_not_found_please_complete_your_profile">User data not found. Please complete your profile.</string>
+    <string name="error_starting_activity_please_try_again_later">Error starting activity. Please try again later.</string>
+    <string name="not_logged_in_error">You must be logged in to view this page. Redirecting to login…</string>
+    <string name="error_fetching_following_list">Error fetching following list: %1$s</string>
+    <string name="no_followings_found_or_missing_emails">No followings found or missing emails.</string>
+    <string name="not_logged_in">Not logged in</string>
+    <string name="unknown">Unknown</string>
+    <string name="add_nearby_users_button">Add Nearby Users</string>
+    <string name="edit_profile_button">Edit Profile</string>
+    <string name="logout">Logout</string>
+    <string name="my_post">My Post</string>
+    <string name="my_likes">My Likes</string>
+    <string name="add_post">Add Post</string>
+    <string name="name">name</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="register">Register</string>
+    <string name="already_have_an_account">Already have an Account?</string>
+    <string name="login">Login</string>
+    <string name="create_new_account">Create New Account</string>
 </resources>

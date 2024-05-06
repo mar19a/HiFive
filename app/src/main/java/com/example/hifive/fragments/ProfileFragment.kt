@@ -52,8 +52,8 @@ class ProfileFragment : Fragment() {
 
     private fun setupViewPager() {
         viewPagerAdapter = ViewPagerAdapter(childFragmentManager)
-        viewPagerAdapter.addFragments(MyPostFragment(), "My Post")
-        viewPagerAdapter.addFragments(MyLikesFragment(), "My Likes") // Assuming you rename or repurpose MyReelsFragment
+        viewPagerAdapter.addFragments(MyPostFragment(), getString(R.string.my_post))
+        viewPagerAdapter.addFragments(MyLikesFragment(), getString(R.string.my_likes)) // Assuming you rename or repurpose MyReelsFragment
         binding.viewPager.adapter = viewPagerAdapter
         binding.tabLayout.setupWithViewPager(binding.viewPager)
     }
@@ -96,19 +96,21 @@ class ProfileFragment : Fragment() {
     }
 
     private fun handleUserDataNotFound() {
-        Toast.makeText(context, "User data not found. Please complete your profile.", Toast.LENGTH_LONG).show()
+        Toast.makeText(context,
+            getString(R.string.user_data_not_found_please_complete_your_profile), Toast.LENGTH_LONG).show()
         val intent = Intent(activity, SignUpActivity::class.java).apply {
             putExtra("MODE", 1)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
-        activity?.startActivity(intent) ?: Toast.makeText(context, "Error starting activity. Please try again later.", Toast.LENGTH_SHORT).show()
+        activity?.startActivity(intent) ?: Toast.makeText(context,
+            getString(R.string.error_starting_activity_please_try_again_later), Toast.LENGTH_SHORT).show()
     }
 
     private fun handleUserNotLoggedIn() {
-        Toast.makeText(context, "You must be logged in to view this page. Redirecting to login...", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, getString(R.string.not_logged_in_error), Toast.LENGTH_LONG).show()
         val intent = Intent(activity, LoginActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
-        activity?.startActivity(intent) ?: Toast.makeText(context, "Error starting activity. Please try again later.", Toast.LENGTH_SHORT).show()
+        activity?.startActivity(intent) ?: Toast.makeText(context, getString(R.string.error_starting_activity_please_try_again_later), Toast.LENGTH_SHORT).show()
     }
 }
