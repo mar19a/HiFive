@@ -57,6 +57,9 @@ class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
         Glide.with(context).load(post.postUrl).placeholder(R.drawable.loading).into(holder.binding.postImage)
         holder.binding.time.text = TimeAgo.using(post.time.toLong())
         holder.binding.csption.text = post.caption
+        holder.binding.eventAddress.text = post.eventAddr
+        holder.binding.eventDate.text = post.eventDate
+        holder.binding.eventTime.text = post.eventTime
 
         checkLikeStatus(post, holder)
 
