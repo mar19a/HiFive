@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.hifive.Models.Post
+import com.example.hifive.R
 import com.example.hifive.databinding.CommentItemBinding
 
 class CommentAdapter(private var comments: List<Post.Comment>) : RecyclerView.Adapter<CommentAdapter.CommentViewHolder>() {
@@ -26,9 +27,13 @@ class CommentAdapter(private var comments: List<Post.Comment>) : RecyclerView.Ad
 
     inner class CommentViewHolder(private val binding: CommentItemBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(comment: Post.Comment) {
-            binding.userName.text = comment.userName
-            Glide.with(binding.userImage.context).load(comment.userImageUrl).into(binding.userImage)
+            binding.userName.text = comment.userName ?: "Unknown"
+            Glide.with(binding.userImage.context)
+                .load(comment.userImageUrl)
+                .placeholder(R.drawable.user)
+                .into(binding.userImage)
             binding.commentText.text = comment.text
         }
     }
+
 }

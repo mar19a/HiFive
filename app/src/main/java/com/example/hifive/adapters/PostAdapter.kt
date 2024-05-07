@@ -71,23 +71,35 @@ class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
                     commentAdapter?.updateComments(comments ?: listOf())
                 }
         }
+
     }
 
     private fun submitComment(commentText: String, postId: String) {
         val currentUser = Firebase.auth.currentUser
         if (currentUser != null) {
-            val comment = hashMapOf(
-                "userId" to currentUser.uid,
-                "text" to commentText,
-                "timestamp" to System.currentTimeMillis()
-            )
-            Firebase.firestore.collection("posts").document(postId)
-                .collection("comments").add(comment)
-                .addOnSuccessListener {
-                    Toast.makeText(context, "Comment added successfully", Toast.LENGTH_SHORT).show()
-                }
-                .addOnFailureListener { e ->
-                    Toast.makeText(context, "Failed to add comment: ${e.message}", Toast.LENGTH_LONG).show()
+            // Fetch user details when submitting a comment
+            Firebase.firestore.collection(USER_NODE).document(currentUser.uid).get()
+                .addOnSuccessListener { userSnapshot ->
+                    val user = userSnapshot.toObject<User>()
+                    if (user != null) {
+                        val comment = hashMapOf(
+                            "userId" to currentUser.uid,
+                            "userName" to user.name,
+                            "userImageUrl" to user.image,
+                            "text" to commentText,
+                            "timestamp" to System.currentTimeMillis()
+                        )
+                        Firebase.firestore.collection("posts").document(postId)
+                            .collection("comments").add(comment)
+                            .addOnSuccessListener {
+                                Toast.makeText(context, "Comment added successfully", Toast.LENGTH_SHORT).show()
+                            }
+                            .addOnFailureListener { e ->
+                                Toast.makeText(context, "Failed to add comment: ${e.message}", Toast.LENGTH_LONG).show()
+                            }
+                    } else {
+                        Toast.makeText(context, "User data not available.", Toast.LENGTH_SHORT).show()
+                    }
                 }
         } else {
             Toast.makeText(context, "You need to be logged in to comment.", Toast.LENGTH_LONG).show()
