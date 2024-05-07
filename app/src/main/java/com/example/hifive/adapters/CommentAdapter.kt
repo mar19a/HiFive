@@ -7,6 +7,7 @@ import com.bumptech.glide.Glide
 import com.example.hifive.Models.Post
 import com.example.hifive.R
 import com.example.hifive.databinding.CommentItemBinding
+import com.github.marlonlom.utilities.timeago.TimeAgo
 
 class CommentAdapter(private var comments: List<Post.Comment>) : RecyclerView.Adapter<CommentAdapter.CommentViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CommentViewHolder {
@@ -33,6 +34,11 @@ class CommentAdapter(private var comments: List<Post.Comment>) : RecyclerView.Ad
                 .placeholder(R.drawable.user)
                 .into(binding.userImage)
             binding.commentText.text = comment.text
+
+            comment.timestamp?.let {
+                val timeAgo = TimeAgo.using(it)
+                binding.timeAgo.text = timeAgo
+            }
         }
     }
 
