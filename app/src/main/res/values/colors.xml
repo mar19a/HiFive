@@ -6,4 +6,5 @@
     <color name="blue">#1E88E5</color>
     <color name="red">#FF0000</color>
     <color name="purple_500">#9C27B0</color>
+    <color name="purple_600">#1A9C27B0</color>
 </resources>

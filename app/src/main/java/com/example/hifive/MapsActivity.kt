@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
+import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -25,9 +26,9 @@ import java.util.Locale
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
-    companion object {
-        private const val PERMISSIONS_REQUEST_LOCATION = 101
-    }
+//    companion object {
+//        private const val PERMISSIONS_REQUEST_LOCATION = 101
+//    }
     private var addr = ""
 
     private lateinit var latlong: String
@@ -54,6 +55,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        binding.zooming.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, newZoom: Int, fromUser: Boolean) {
+                // Update UI or perform actions based on the progress change
+                if (::mMap.isInitialized) {
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(newZoom.toFloat()))
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                // Called when the user starts moving the thumb
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                // Called when the user stops moving the thumb
+            }
+
+        })
 
         binding.send.setOnClickListener {
             val intent = Intent(this@MapsActivity, PostActivity::class.java).apply {

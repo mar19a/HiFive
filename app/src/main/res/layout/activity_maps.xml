@@ -17,6 +17,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         tools:context=".MapsActivity" />
 
+    <SeekBar
+        android:id="@+id/zooming"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_margin="16dp"
+        android:progress="15"
+        android:min="3"
+        android:max="21"
+        android:background="@color/purple_600"
+        app:layout_constraintBottom_toTopOf="@+id/send"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <Button
         android:id="@+id/send"
         android:layout_width="match_parent"
@@ -26,5 +38,6 @@
         android:enabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
