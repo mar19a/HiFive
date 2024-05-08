@@ -26,6 +26,7 @@ import com.example.hifive.databinding.FragmentHomeBinding
 import com.example.hifive.utils.FOLLOW
 import com.example.hifive.utils.POST
 import com.example.hifive.utils.USER_NODE
+import com.google.firebase.firestore.Query
 import com.squareup.picasso.Picasso
 
 class HomeFragment : Fragment() {
@@ -85,7 +86,9 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadPosts() {
-        Firebase.firestore.collection("posts").get()
+        Firebase.firestore.collection("posts")
+            .orderBy("time", Query.Direction.DESCENDING)
+            .get()
             .addOnSuccessListener { documents ->
                 val tempList = ArrayList<Post>()
                 postList.clear()
@@ -101,6 +104,7 @@ class HomeFragment : Fragment() {
                 Log.e("HomeFragment", "Error loading posts: ", exception)
             }
     }
+
 
     private fun loadFollows() {
         Firebase.firestore.collection(Firebase.auth.currentUser!!.uid + FOLLOW).get()
