@@ -56,15 +56,22 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        Log.d("MapsFragment", mapsVM.getLocation().toString())
+        Log.d("MapsFragment", mapsVM.getMyLocation().toString())
 
         mapFragment = childFragmentManager.findFragmentById(R.id.mapFragment) as? SupportMapFragment
         mapFragment?.getMapAsync(this)
 
+        binding.b1.setOnClickListener() {
+
+        }
+
         binding.zooming.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+            override fun onProgressChanged(seekBar: SeekBar, newZoom: Int, fromUser: Boolean) {
                 // Update UI or perform actions based on the progress change
-                updateCameraZoom(progress)
+                if (::mMap.isInitialized) {
+                    moveMap(mapsVM.getCurrentLocation(), newZoom.toFloat())
+                    mapsVM.setZoom(newZoom.toFloat())
+                }
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -74,6 +81,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 // Called when the user stops moving the thumb
             }
+
         })
 
     }
@@ -81,10 +89,17 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
 
         //getLocation()
-
         mMap = googleMap
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mapsVM.getLocation()!!, 15f))
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mapsVM.getCurrentLocation(), mapsVM.getZoom().toFloat()))
+
+        mMap.setOnCameraIdleListener {
+            // Get the center LatLng of the map when the camera stops moving
+            mapsVM.setCurrentLocation(mMap.cameraPosition.target)
+            mapsVM.setZoom(mMap.cameraPosition.zoom)
+            Log.d("MapsFragment", mapsVM.getCurrentLocation().toString())
+            // Do something with currentLatLng
+        }
 
         Firebase.firestore.collection("posts").get().addOnSuccessListener {
             val tempList = ArrayList<Post>()
@@ -131,6 +146,8 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         }
    }
 
+
+
     private fun convertStringToLatLng(latlngString: String): LatLng {
         // Split the string into latitude and longitude parts
         val latlngParts = latlngString.split(",")
@@ -152,10 +169,11 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     }
 
 
-    private fun updateCameraZoom(zoom: Int) {
+    private fun moveMap(newLoc: LatLng, newZoom: Float) {
         //mMap.animateCamera(CameraUpdateFactory.zoomTo(mMap.cameraPosition.zoom + zoom))
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(zoom.toFloat()))
-        Log.d("MapsFragment", mMap.cameraPosition.zoom.toString())
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newLoc, mapsVM.getZoom()))
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(newZoom))
+        Log.d("MapsFragment", "currentLoc = ${mMap.cameraPosition.zoom}")
     }
 
 

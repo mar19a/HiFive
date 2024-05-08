@@ -48,11 +48,11 @@ class HomeActivity : AppCompatActivity() {
         if (hasLocationPermission()) {
             // Permissions already granted, proceed to retrieve location
             findLocation()
-            Log.d("HomeActivity2", "has perms: location is: ${mapsVM.getLocation()}")
+            Log.d("HomeActivity2", "has perms: location is: ${mapsVM.getMyLocation()}")
         } else {
             // Request location permissions
             requestLocationPermission()
-            Log.d("HomeActivity2", "request: location is: ${mapsVM.getLocation()}")
+            Log.d("HomeActivity2", "request: location is: ${mapsVM.getMyLocation()}")
         }
 
     }
@@ -84,7 +84,7 @@ class HomeActivity : AppCompatActivity() {
                 findLocation()
             } else {
                 // Permissions denied, using default location
-                mapsVM.setLocation(default)
+                mapsVM.setMyLocation(default)
             }
         }
     }
@@ -99,16 +99,19 @@ class HomeActivity : AppCompatActivity() {
                 // Got last known location. In some rare situations this can be null.
                 if (loc != null) {
                     location =  LatLng(loc.latitude, loc.longitude)
-                    mapsVM.setLocation(location)
+                    mapsVM.setMyLocation(location)
+                    mapsVM.setCurrentLocation(location)
                     Log.d("HomeActivity2", location.toString())
                 } else {
-                    mapsVM.setLocation(location)
+                    mapsVM.setMyLocation(location)
+                    mapsVM.setCurrentLocation(location)
                     Log.d("HomeActivity2", "null")
                 }
             }
             .addOnFailureListener { e ->
                 // Handle failure to retrieve location
-                mapsVM.setLocation(location)
+                mapsVM.setMyLocation(location)
+                mapsVM.setCurrentLocation(location)
                 Log.e("HomeActivity2", "Error getting location: ${e.message}", e)
             }
     }
