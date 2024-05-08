@@ -1,6 +1,7 @@
 package com.example.hifive.fragments
 
 
+import com.example.hifive.adapters.EventInfoAdapter
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import android.location.Location
-import android.widget.Toast
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -17,7 +17,6 @@ import com.example.hifive.MapsViewModel
 import com.example.hifive.Models.Post
 import com.example.hifive.R
 import com.example.hifive.databinding.FragmentMapsBinding
-import com.example.hifive.utils.POST
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -91,6 +90,9 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         //getLocation()
         mMap = googleMap
 
+        val eventInfoAdapter = EventInfoAdapter(requireContext())
+        mMap.setInfoWindowAdapter(eventInfoAdapter)
+
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mapsVM.getCurrentLocation(), mapsVM.getZoom().toFloat()))
 
         mMap.setOnCameraIdleListener {
@@ -126,7 +128,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                 mMap.addMarker(MarkerOptions()
                     .position(loc)
                     .title(tempList[index].title)
-                    .snippet(tempList[index].caption)
+                    .snippet("${tempList[index].caption}@${tempList[index].postUrl}")
                     .icon(icon))
             }
             postList.addAll(tempList)
@@ -141,7 +143,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
             // Example: Display a toast with the marker title
             //Toast.makeText(context, "Clicked marker: ${marker.title}", Toast.LENGTH_SHORT).show()
-
+            Log.d("MapsFragment", "dist = ${calcDistance(mapsVM.getMyLocation(), LatLng(marker.position.latitude, marker.position.longitude), "Km")}")
             false // Return true to consume the event and prevent default behavior (such as showing info window)
         }
    }
