@@ -28,7 +28,22 @@ class SearchFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState) // Standard onCreate method in fragments
+    }
 
+    override fun onResume() {
+        super.onResume()
+        Firebase.firestore.collection(Firebase.auth.currentUser!!.uid + FOLLOW).get()
+            .addOnSuccessListener {
+                var tempList=ArrayList<User>()
+                userList.clear()
+                for(i in it.documents){
+                    var user:User=i.toObject<User>()!! // Add user to the temporary list
+                    tempList.add(user) // Add user to the temporary list
+                }
+                userList.addAll(tempList)  // Update the main user list
+                adapter.notifyDataSetChanged() // Notify the adapter of data change
+
+            }
     }
 
     override fun onCreateView(
