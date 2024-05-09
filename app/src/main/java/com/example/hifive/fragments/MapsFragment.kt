@@ -89,28 +89,23 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
                     for (marker in markerList) {
                         // Do something with each marker in the list
-                        if (typeMarkerList.contains(marker)) {
-                            val myDist = calcDistance(
-                                mapsVM.getMyLocation(),
-                                LatLng(marker.position.latitude, marker.position.longitude)
-                            )
-                            Log.d("MapsFragment", "${marker}=${myDist}")
-                            if (myDist > mDist && mDist != 0.0) {
-                                marker.isVisible = false
-                                distMarkerList.remove(marker)
-                            } else {
+                        val myDist = calcDistance(
+                            mapsVM.getMyLocation(),
+                            LatLng(marker.position.latitude, marker.position.longitude)
+                        )
+                        Log.d("MapsFragment", "${marker}=${myDist}")
+                        if (myDist > mDist && mDist != 0.0) {
+                            marker.isVisible = false
+                            distMarkerList.remove(marker)
+                        } else {
+                            if (typeMarkerList.contains(marker)) {
                                 marker.isVisible = true
-                                distMarkerList.add(marker)
                             }
+                            distMarkerList.add(marker)
                         }
                     }
                     circle = mMap.addCircle(circleOptions)
                 }
-//                Toast.makeText(
-//                    requireContext(),
-//                    "Selected: ${parent.getItemAtPosition(position)}",
-//                    Toast.LENGTH_SHORT
-//                ).show()
             }
 
         val timeList: AutoCompleteTextView = binding.tlist
@@ -122,29 +117,28 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                     Log.d("MapsFragment", "center=${mapsVM.getMyLocation()}, time(mTime)=${mType}")
 
                     markerList.forEachIndexed { index, marker ->
-                        if (distMarkerList.contains(marker)) {
-                            // Do something with each marker in the list
-                            if ((mType == "Social" || mType == "Any") && eventList[index].eventType == "Social") {
+                        // Do something with each marker in the list
+                        if ((mType == "Social" || mType == "Any") && eventList[index].eventType == "Social") {
+                            if (distMarkerList.contains(marker)) {
                                 marker.isVisible = true
-                                typeMarkerList.add(marker)
-                            } else if ((mType == "Business" || mType == "Any") && eventList[index].eventType == "Business") {
-                                marker.isVisible = true
-                                typeMarkerList.add(marker)
-                            } else if ((mType == "Other" || mType == "Any") && eventList[index].eventType == "Other") {
-                                marker.isVisible = true
-                                typeMarkerList.add(marker)
-                            } else {
-                                marker.isVisible = false
-                                typeMarkerList.remove(marker)
                             }
+                            typeMarkerList.add(marker)
+                        } else if ((mType == "Business" || mType == "Any") && eventList[index].eventType == "Business") {
+                            if (distMarkerList.contains(marker)) {
+                                marker.isVisible = true
+                            }
+                            typeMarkerList.add(marker)
+                        } else if ((mType == "Other" || mType == "Any") && eventList[index].eventType == "Other") {
+                            if (distMarkerList.contains(marker)) {
+                                marker.isVisible = true
+                            }
+                            typeMarkerList.add(marker)
+                        } else {
+                            marker.isVisible = false
+                            typeMarkerList.remove(marker)
                         }
                     }
                 }
-//                Toast.makeText(
-//                    requireContext(),
-//                    "Selected: ${parent.getItemAtPosition(position)}",
-//                    Toast.LENGTH_SHORT
-//                ).show()
             }
 
         binding.zooming.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -170,7 +164,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
 
-        //getLocation()
         mMap = googleMap
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mapsVM.getCurrentLocation(), mapsVM.getZoom().toFloat()))
@@ -183,16 +176,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             // Do something with currentLatLng
         }
 
-//        val animDuration = 2000L // Animation duration in milliseconds
-//
-//        // Define the animation
-//        val anim = ObjectAnimator.ofFloat(binding.eventinfo, "translationY", binding.eventinfo.height.toFloat(), 0f)
-//        anim.duration = animDuration
-//
-//        mMap.setOnMapClickListener {
-//            anim.start()
-//            binding.eventinfo.visibility = View.GONE
-//        }
 
         Firebase.firestore.collection("posts").get().addOnSuccessListener {
             val eList = ArrayList<Post>()
@@ -201,18 +184,13 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             markerList.clear()
             distMarkerList.clear()
             typeMarkerList.clear()
-            var ploc = LatLng(0.0,0.0)
             for ((index,i) in it.documents.withIndex()) {
 
                 val post: Post = i.toObject<Post>()!!
                 eList.add(post)
                 //Log.d("MapsFragment", tempList[index].eventLoc)
                 val loc = convertStringToLatLng(eList[index].eventLoc)
-//                if (index == 0)
-//                    ploc = loc
-//                if (index == 1)
-//                    Log.d("MapsFragment", "distance between ${ploc} and ${loc} = ${calcDistance(ploc, loc, "Miles")}")
-                //Log.d("MapsFragment", loc.toString())
+
                 val icon: BitmapDescriptor = if (eList[index].eventType == "Social") {
                     BitmapDescriptorFactory.fromResource(R.drawable.markertest)
                 } else if (eList[index].eventType == "Business") {
@@ -242,10 +220,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
         mMap.setOnMarkerClickListener { marker ->
             // Handle marker click event here
-            //val markerTag = marker.tag
-            // Use markerTag as needed
-
-            // Example: Display a toast with the marker title
             //Toast.makeText(context, "Clicked marker: ${marker.title}", Toast.LENGTH_SHORT).show()
             Log.d("MapsFragment", "dist = ${calcDistance(mapsVM.getMyLocation(), LatLng(marker.position.latitude, marker.position.longitude))}")
             false // Return true to consume the event and prevent default behavior (such as showing info window)

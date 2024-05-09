@@ -26,9 +26,7 @@ import java.util.Locale
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
-//    companion object {
-//        private const val PERMISSIONS_REQUEST_LOCATION = 101
-//    }
+
     private var addr = ""
 
     private lateinit var latlong: String
@@ -84,22 +82,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-//        if (default != null) {
-//            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(default, 15f))
-//        } else {
-//            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(default, 15f))
-//        }
+
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(convertStringToLatLng(userLocation), 15f))
 
         googleMap.setOnMapClickListener { llng ->
@@ -121,34 +106,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
-//    private fun checkLocationPermission() {
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-//            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//
-//            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-//                AlertDialog.Builder(this)
-//                    .setTitle("Location Permission Needed")
-//                    .setMessage("This app needs the Location permission, please accept to use location functionality")
-//                    .setPositiveButton("OK") { _, _ ->
-//                        ActivityCompat.requestPermissions(this,
-//                            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
-//                            PERMISSIONS_REQUEST_LOCATION)
-//                    }
-//                    .create()
-//                    .show()
-//            } else {
-//                ActivityCompat.requestPermissions(this,
-//                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
-//                    PERMISSIONS_REQUEST_LOCATION)
-//            }
-//        } else {
-//            if (userLocation.isNotBlank()) {
-//                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(convertStringToLatLng(userLocation), 15f))
-//            } else {
-//                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(default, 15f))
-//            }
-//        }
-//    }
     
     private fun getAddress(llng: LatLng) : String? {
 
@@ -177,42 +134,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         return address
     }
 
-// This activity doesn't make any location requests. That is done in the HomeActivity
-
-//    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults) // Call the superclass method
-//
-//        when (requestCode) {
-//            PERMISSIONS_REQUEST_LOCATION -> {
-//                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-//                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(convertStringToLatLng(userLocation), 15f))
-//                    }
-//                } else {
-//                    Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show()
-//                }
-//            }
-//        }
-//    }
-
-//    private fun convertStringToLatLng(latlngString: String): LatLng {
-////        if (latlngString.isNullOrEmpty() || !latlngString.contains(",")) {
-////            Log.e("MapsActivity", "Invalid LatLng string: '$latlngString'")
-////            return default
-////        }
-//        val latlngParts = latlngString.split(",").map { it.trim() }
-//        if (latlngParts.size == 2) {
-//            try {
-//                val latitude = latlngParts[0].toDouble()
-//                val longitude = latlngParts[1].toDouble()
-//                return LatLng(latitude, longitude)
-//            } catch (e: NumberFormatException) {
-//                Log.e("MapsActivity", "Error parsing latitude or longitude from string: '$latlngString'")
-//                return default
-//            }
-//        }
-//        return default
-//    }
     private fun convertStringToLatLng(latlngString: String): LatLng {
         // Split the string into latitude and longitude parts
         val latlngParts = latlngString.split(",")
