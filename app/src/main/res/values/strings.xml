@@ -110,5 +110,6 @@
     <string name="please_upload_an_image_first">Please upload an image first.</string>
     <string name="hint_write_a_comment">Write A Comment</string>
     <string name="submit">Submit</string>
+    <string name="distance">Distance</string>
 
 </resources>
