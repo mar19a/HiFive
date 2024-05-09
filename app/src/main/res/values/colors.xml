@@ -5,6 +5,8 @@
     <color name="pink">#C13584</color>
     <color name="blue">#1E88E5</color>
     <color name="red">#FF0000</color>
-
-
+    <color name="purple_500">#9C27B0</color>
+    <color name="purple_600">#1A9C27B0</color>
+    <color name="purple_700">#FF613999</color>
+    <color name="purple_800">#FFEFE5FD</color>
 </resources>

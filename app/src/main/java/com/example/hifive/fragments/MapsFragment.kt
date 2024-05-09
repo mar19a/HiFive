@@ -1,6 +1,9 @@
 package com.example.hifive.fragments
 
 
+import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
+import com.example.hifive.adapters.EventInfoAdapter
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import android.location.Location
-import android.widget.Toast
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -17,7 +19,6 @@ import com.example.hifive.MapsViewModel
 import com.example.hifive.Models.Post
 import com.example.hifive.R
 import com.example.hifive.databinding.FragmentMapsBinding
-import com.example.hifive.utils.POST
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -30,6 +31,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
+import com.squareup.picasso.Picasso
 
 
 class MapsFragment : Fragment(), OnMapReadyCallback {
@@ -38,7 +40,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
 
-    private var postList = ArrayList<Post>()
+    private var eventList = ArrayList<Post>()
 
     private val mapsVM: MapsViewModel by activityViewModels()
 
@@ -56,15 +58,18 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        Log.d("MapsFragment", mapsVM.getLocation().toString())
+        Log.d("MapsFragment", mapsVM.getMyLocation().toString())
 
         mapFragment = childFragmentManager.findFragmentById(R.id.mapFragment) as? SupportMapFragment
         mapFragment?.getMapAsync(this)
 
         binding.zooming.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+            override fun onProgressChanged(seekBar: SeekBar, newZoom: Int, fromUser: Boolean) {
                 // Update UI or perform actions based on the progress change
-                updateCameraZoom(progress)
+                if (::mMap.isInitialized) {
+                    moveMap(mapsVM.getCurrentLocation(), newZoom.toFloat())
+                    mapsVM.setZoom(newZoom.toFloat())
+                }
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -74,6 +79,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 // Called when the user stops moving the thumb
             }
+
         })
 
     }
@@ -81,14 +87,32 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
 
         //getLocation()
-
         mMap = googleMap
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mapsVM.getLocation()!!, 15f))
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mapsVM.getCurrentLocation(), mapsVM.getZoom().toFloat()))
+
+        mMap.setOnCameraIdleListener {
+            // Get the center LatLng of the map when the camera stops moving
+            mapsVM.setCurrentLocation(mMap.cameraPosition.target)
+            mapsVM.setZoom(mMap.cameraPosition.zoom)
+            Log.d("MapsFragment", mapsVM.getCurrentLocation().toString())
+            // Do something with currentLatLng
+        }
+
+//        val animDuration = 2000L // Animation duration in milliseconds
+//
+//        // Define the animation
+//        val anim = ObjectAnimator.ofFloat(binding.eventinfo, "translationY", binding.eventinfo.height.toFloat(), 0f)
+//        anim.duration = animDuration
+//
+//        mMap.setOnMapClickListener {
+//            anim.start()
+//            binding.eventinfo.visibility = View.GONE
+//        }
 
         Firebase.firestore.collection("posts").get().addOnSuccessListener {
             val tempList = ArrayList<Post>()
-            postList.clear()
+            eventList.clear()
             var ploc = LatLng(0.0,0.0)
             for ((index,i) in it.documents.withIndex()) {
 
@@ -108,13 +132,17 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                 } else {
                     BitmapDescriptorFactory.fromResource(R.drawable.markertesto)
                 }
+                Picasso.get().load(tempList[index].postUrl).fetch()
                 mMap.addMarker(MarkerOptions()
                     .position(loc)
                     .title(tempList[index].title)
-                    .snippet(tempList[index].caption)
+                    //.snippet("${tempList[index].caption}@${tempList[index].postUrl}")
+                    .snippet(tempList[index].postId)
                     .icon(icon))
             }
-            postList.addAll(tempList)
+            eventList.addAll(tempList)
+            val eventInfoAdapter = EventInfoAdapter(requireContext(), eventList)
+            mMap.setInfoWindowAdapter(eventInfoAdapter)
             //Log.d("mapsf", postList.size.toString())
         }
         //Log.d("MapsFragment", "distance between ${postList[0].eventLoc} and ${postList[1].eventLoc} =")
@@ -126,10 +154,12 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
             // Example: Display a toast with the marker title
             //Toast.makeText(context, "Clicked marker: ${marker.title}", Toast.LENGTH_SHORT).show()
-
+            Log.d("MapsFragment", "dist = ${calcDistance(mapsVM.getMyLocation(), LatLng(marker.position.latitude, marker.position.longitude), "Km")}")
             false // Return true to consume the event and prevent default behavior (such as showing info window)
         }
    }
+
+
 
     private fun convertStringToLatLng(latlngString: String): LatLng {
         // Split the string into latitude and longitude parts
@@ -152,10 +182,11 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     }
 
 
-    private fun updateCameraZoom(zoom: Int) {
+    private fun moveMap(newLoc: LatLng, newZoom: Float) {
         //mMap.animateCamera(CameraUpdateFactory.zoomTo(mMap.cameraPosition.zoom + zoom))
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(zoom.toFloat()))
-        Log.d("MapsFragment", mMap.cameraPosition.zoom.toString())
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newLoc, mapsVM.getZoom()))
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(newZoom))
+        Log.d("MapsFragment", "currentLoc = ${mMap.cameraPosition.zoom}")
     }
 
 

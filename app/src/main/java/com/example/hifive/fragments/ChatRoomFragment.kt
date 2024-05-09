@@ -19,46 +19,50 @@ import com.example.hifive.Models.Message
 import com.example.hifive.Models.User
 import com.google.firebase.Timestamp
 import com.example.hifive.utils.USER_NODE
-
+// Fragment to manage chat interactions in a room.
 class ChatRoomFragment : Fragment() {
     private var _binding: FragmentChatRoomBinding? = null
+    // Use Kotlin property delegation to handle the nullable binding property safely.
     private val binding get() = _binding!!
+    // Declare and initialize the message adapter and layout manager for the RecyclerView.
     private lateinit var messageAdapter: MessageAdapter
     private lateinit var layoutManager: LinearLayoutManager
-
+    // Inflate the layout and set up UI components.
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentChatRoomBinding.inflate(inflater, container, false)
         setupToolbar()
         setupRecyclerView()
         return binding.root
     }
-
+    // Sets up the toolbar with a back navigation button.
     private fun setupToolbar() {
         val backButton = binding.toolbarChatRoom.findViewById<ImageView>(R.id.backButtonChatRoom)
         backButton.setOnClickListener {
+            // Navigate up in the navigation hierarchy.
             findNavController().navigateUp()
         }
     }
-
+    // Configures the RecyclerView with a linear layout manager and message adapter.
     private fun setupRecyclerView() {
         layoutManager = LinearLayoutManager(context)
         messageAdapter = MessageAdapter(mutableListOf())
         binding.messagesRecyclerView.adapter = messageAdapter
         binding.messagesRecyclerView.layoutManager = layoutManager
     }
-
+    // After the view is created, set up the chat functionality.
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // Fetch user IDs from arguments or return if not found.
         val toUserId = arguments?.getString("userId") ?: return
         val fromUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-
+        // Log user IDs for debugging.
         Log.d("ChatRoomFragment", "Received toUserId: $toUserId")
         Log.d("ChatRoomFragment", "Current fromUserId: $fromUserId")
-        // Ensuring the chat session ID is generated consistently
+        // Generate a chat session ID based on user IDs.
         val chatSessionId = getChatSessionId(fromUserId, toUserId)
         Log.d("ChatRoomFragment", "Using Chat Session ID: $chatSessionId")
         loadMessages(chatSessionId)
-
+        // Send a message when the send button is clicked.
         binding.sendMessageButton.setOnClickListener {
             val messageText = binding.messageInputEditText.text.toString()
             if (messageText.isNotEmpty()) {
@@ -68,13 +72,13 @@ class ChatRoomFragment : Fragment() {
             }
         }
     }
-
+    // Send a message when the send button is clicked.
     private fun getChatSessionId(toUserId: String, fromUserId: String): String {
         Log.d("ChatRoomFragment", "User2 ID (toUserId): $toUserId")
         Log.d("ChatRoomFragment", "User1 ID (fromUserId): $fromUserId")
         return if (toUserId < fromUserId) "$toUserId$fromUserId" else "$fromUserId$toUserId"
     }
-
+    // Load messages for the chat session.
     private fun loadMessages(chatSessionId: String) {
         FirebaseFirestore.getInstance().collection("chatSessions")
             .document(chatSessionId)
@@ -92,7 +96,7 @@ class ChatRoomFragment : Fragment() {
                 }
             }
     }
-
+    // Send a message to Firebase.
     private fun sendMessageToFirebase(toUserId: String, fromUserId: String, chatSessionId: String, messageText: String) {
         // Fetch user details from the USER_NODE collection before sending a message
         FirebaseFirestore.getInstance().collection(USER_NODE).document(fromUserId).get()
@@ -125,7 +129,7 @@ class ChatRoomFragment : Fragment() {
                 Toast.makeText(context, "Error fetching user details: ${e.message}", Toast.LENGTH_LONG).show()
             }
     }
-
+    // Clean up binding when the view is destroyed.
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

@@ -94,4 +94,7 @@
     <string name="login">Login</string>
     <string name="create_new_account">Create New Account</string>
     <string name="confirm_location">Confirm Location</string>
+    <string name="hint_write_a_comment">Write A Comment</string>
+    <string name="submit">Submit</string>
+
 </resources>

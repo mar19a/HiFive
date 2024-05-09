@@ -49,4 +49,6 @@
     <string name="login">로그인</string>
     <string name="create_new_account">어카운트 만들기</string>
     <string name="confirm_location">위치 화긴</string>
+    <string name="hint_write_a_comment">코멘트 쓰기</string>
+    <string name="submit">제출하다</string>
 </resources>

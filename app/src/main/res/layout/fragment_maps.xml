@@ -13,30 +13,133 @@
         android:layout_height="match_parent"
         tools:context=".fragments.MapsFragment" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal">
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/purple_800"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/zooms" />
 
-        <Button
-            android:id="@+id/send"
+    <LinearLayout
+        android:id="@+id/filters"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" >
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/f1"
+            style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="B1"
-            android:layout_margin="20dp" />
+            android:hint="Distance"
+            android:textColorHint="@color/white"
+            >
+
+            <AutoCompleteTextView
+                android:id="@+id/f1a"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:background="@color/purple_700"
+                android:textColor="@color/white"
+                android:text="Other"
+                app:simpleItems="@array/event_options"
+                />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/f2"
+            style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Time"
+            android:textColorHint="@color/white"
+            >
+
+            <AutoCompleteTextView
+                android:id="@+id/f2a"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:text="Other"
+                android:textColor="@color/white"
+                android:background="@android:color/holo_purple"
+                android:maxLines="1"
+                app:simpleItems="@array/event_options"
+                />
+
+        </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>
 
-    <SeekBar
-        android:id="@+id/zooming"
+    <LinearLayout
+        android:id="@+id/zooms"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:progress="15"
-        android:min="3"
-        android:max="21"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/filters"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" >
+
+        <ImageView
+            android:id="@+id/minuszoom"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:padding="10dp"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/minuszoom" />
+
+        <SeekBar
+            android:id="@+id/zooming"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_weight="100"
+            android:progress="15"
+            android:min="3"
+            android:max="21" />
+
+        <ImageView
+            android:id="@+id/pluszoom"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:padding="10dp"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/pluszoom" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Re-Center"
+        android:layout_margin="20dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+<!--    <View-->
+<!--        android:id="@+id/eventinfo"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="300dp"-->
+<!--        android:visibility="gone"-->
+<!--        android:background="@color/purple_500"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent" />-->
+
+
 
 
 

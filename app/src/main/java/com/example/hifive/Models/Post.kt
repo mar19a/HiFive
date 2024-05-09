@@ -15,9 +15,14 @@ class Post {
     var eventDate:String=""
     var eventTime:String=""
     var isLikedByCurrentUser: Boolean = false
+    var comments: List<Comment> = listOf()
 
 
     constructor()
+
+    class Comment(val userId: String, val userName: String, val userImageUrl: String, val text: String, val timestamp: Long) {
+        constructor() : this("", "", "", "", 0)
+    }
 
     constructor(postId: String, postUrl: String, caption: String) {
         this.postId = postId

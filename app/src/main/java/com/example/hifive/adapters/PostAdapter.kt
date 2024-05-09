@@ -19,23 +19,111 @@ import com.example.hifive.R
 import com.example.hifive.databinding.PostRvBinding
 import com.example.hifive.utils.USER_NODE
 import com.google.firebase.auth.ktx.auth
+import java.text.SimpleDateFormat
+import java.util.Locale
+import android.view.View
+import androidx.recyclerview.widget.LinearLayoutManager
 
-
+// Adapter class for displaying posts in a RecyclerView.
 class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
     RecyclerView.Adapter<PostAdapter.MyHolder>() {
+    // Inner class for managing the views associated with each item in the RecyclerView.
+    inner class MyHolder(var binding: PostRvBinding) : RecyclerView.ViewHolder(binding.root) {
+        var commentAdapter: CommentAdapter? = null // Adapter for handling comments within each post.
 
-    inner class MyHolder(var binding: PostRvBinding) : RecyclerView.ViewHolder(binding.root)
+        init {
+            // Initialize the CommentAdapter with an empty list.
+            commentAdapter = CommentAdapter(listOf())
+            binding.commentsRecyclerView.adapter = commentAdapter
+            binding.commentsRecyclerView.layoutManager = LinearLayoutManager(context)
+            // Set an OnClickListener to handle clicks on the post's address.
+            binding.eventAddress.setOnClickListener {
+                val address = postList[adapterPosition].eventAddr
+                openGoogleMaps(address) // Open the clicked address in Google Maps.
+            }
+            // Toggle the visibility of the comments section on click.
+            binding.commentToggle.setOnClickListener {
+                if (binding.commentsSection.visibility == View.VISIBLE) {
+                    binding.commentsSection.visibility = View.GONE
+                } else {
+                    binding.commentsSection.visibility = View.VISIBLE
+                    loadComments(postList[adapterPosition].postId) // Load comments for the post.
+                }
+            }
+            // Handle click events on the submit comment button.
+            binding.submitCommentButton.setOnClickListener {
+                val commentText = binding.commentInput.text.toString()
+                if (commentText.isNotEmpty()) {
+                    submitComment(commentText, postList[adapterPosition].postId) // Submit the comment.
+                    binding.commentInput.setText("") // Clear the comment input field.
+                }
+            }
+        }
 
+        // Load comments from Firestore and update the RecyclerView.
+        fun loadComments(postId: String) {
+            Firebase.firestore.collection("posts").document(postId)
+                .collection("comments")
+                .orderBy("timestamp")
+                .addSnapshotListener { snapshot, e ->
+                    if (e != null) {
+                        Toast.makeText(context, "Error loading comments: ${e.message}", Toast.LENGTH_LONG).show()
+                        return@addSnapshotListener
+                    }
+                    val comments = snapshot?.documents?.mapNotNull { it.toObject(Post.Comment::class.java) }
+                    commentAdapter?.updateComments(comments ?: listOf())
+                }
+        }
+
+    }
+
+    // Submit a new comment to Firestore.
+    private fun submitComment(commentText: String, postId: String) {
+        val currentUser = Firebase.auth.currentUser
+        if (currentUser != null) {
+            // Fetch user details when submitting a comment
+            Firebase.firestore.collection(USER_NODE).document(currentUser.uid).get()
+                .addOnSuccessListener { userSnapshot ->
+                    val user = userSnapshot.toObject<User>()
+                    if (user != null) {
+                        val comment = hashMapOf(
+                            "userId" to currentUser.uid,
+                            "userName" to user.name,
+                            "userImageUrl" to user.image,
+                            "text" to commentText,
+                            "timestamp" to System.currentTimeMillis()
+                        )
+                        Firebase.firestore.collection("posts").document(postId)
+                            .collection("comments").add(comment)
+                            .addOnSuccessListener {
+                                Toast.makeText(context, "Comment added successfully", Toast.LENGTH_SHORT).show()
+                            }
+                            .addOnFailureListener { e ->
+                                Toast.makeText(context, "Failed to add comment: ${e.message}", Toast.LENGTH_LONG).show()
+                            }
+                    } else {
+                        Toast.makeText(context, "User data not available.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        } else {
+            Toast.makeText(context, "You need to be logged in to comment.", Toast.LENGTH_LONG).show()
+        }
+    }
+    // Inflate the layout for each item in the RecyclerView.
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyHolder {
         val binding = PostRvBinding.inflate(LayoutInflater.from(context), parent, false)
         return MyHolder(binding)
     }
-
+    // Return the size of the list that contains the posts.
     override fun getItemCount(): Int = postList.size
 
+    // Bind data to each item based on its position in the list.
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
-        val post = postList[position]
 
+        val post = postList[position]
+        holder.commentAdapter?.updateComments(listOf())
+        holder.binding.eventAddress.text = post.eventAddr
+        // Retrieve and display user details for each post.
         Firebase.firestore.collection(USER_NODE).document(post.uid).get()
             .addOnSuccessListener { documentSnapshot ->
                 val user = documentSnapshot.toObject<User>()
@@ -55,10 +143,21 @@ class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
             }
 
         Glide.with(context).load(post.postUrl).placeholder(R.drawable.loading).into(holder.binding.postImage)
-        //TODO: Fix Localization / Change time display - (when the event will be?)
-        holder.binding.time.text = TimeAgo.using(post.time.toLong())
         holder.binding.caption.text = post.caption
+        holder.binding.time.text = TimeAgo.using(post.time.toLong())
 
+        // Format and display date and time together
+        formatDateTime(holder, post.eventDate, post.eventTime)
+
+        holder.binding.eventAddress.text = post.eventAddr
+        holder.binding.eventAddress.setOnClickListener {
+            openGoogleMapsForDirections(post.eventLoc)
+        }
+
+        holder.binding.imageView8.setOnClickListener {
+            openGoogleMapsForDirections(post.eventLoc)
+        }
+        // Check and toggle the like status of a post.
         checkLikeStatus(post, holder)
 
         holder.binding.like.setOnClickListener {
@@ -77,7 +176,34 @@ class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
             openGoogleMapsForDirections(post.eventLoc)
         }
     }
+    // Open a location in Google Maps.
+    private fun openGoogleMaps(address: String) {
+        val uri = Uri.parse("geo:0,0?q=${Uri.encode(address)}")
+        val intent = Intent(Intent.ACTION_VIEW, uri)
+        intent.setPackage("com.google.android.apps.maps")
+        if (intent.resolveActivity(context.packageManager) != null) {
+            context.startActivity(intent)
+        } else {
+            Toast.makeText(context, "Google Maps is not installed", Toast.LENGTH_SHORT).show()
+        }
+    }
+    // Format and set the date and time text for a post.
+    private fun formatDateTime(holder: MyHolder, date: String, time: String) {
 
+        holder.binding.eventDate.text = "Event happening on $date at ${convert24To12(time)}"
+    }
+    private fun convert24To12(time24: String): String {
+        val parts = time24.split(":")
+        val hour = parts[0].toInt()
+        val minute = parts[1]
+
+        val suffix = if (hour < 12) "AM" else "PM"
+        val hour12 = if (hour == 0) 12 else if (hour > 12) hour - 12 else hour
+
+        return String.format("%02d:%s %s", hour12, minute, suffix)
+    }
+
+    // Check if the current user has liked a post and update the like button icon accordingly.
     private fun checkLikeStatus(post: Post, holder: MyHolder) {
         val userId = Firebase.auth.currentUser?.uid ?: return
         Firebase.firestore.collection("userLikes").document(userId).collection("likes")
@@ -88,6 +214,7 @@ class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
             }
     }
 
+    // Toggle the like status of a post in Firestore.
     private fun toggleLike(post: Post, holder: MyHolder) {
         val userId = Firebase.auth.currentUser?.uid ?: return
         val likeRef = Firebase.firestore.collection("userLikes").document(userId).collection("likes").document(post.postId)
@@ -109,6 +236,7 @@ class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
         }
     }
 
+    // Open Google Maps with directions to a specific event location.
     private fun openGoogleMapsForDirections(eventLoc: String) {
         val gmmIntentUri = Uri.parse("google.navigation:q=$eventLoc")
         val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)

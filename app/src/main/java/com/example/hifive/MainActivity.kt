@@ -12,16 +12,18 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_main) // Set the content view to the main activity layout
 
-        window.statusBarColor = Color.TRANSPARENT
+        window.statusBarColor = Color.TRANSPARENT // Make the status bar transparent
 
+        // Delay the execution of the next block of code using a handler
         Handler(Looper.getMainLooper()).postDelayed({
+            // Check if there is a currently logged-in user
             if (FirebaseAuth.getInstance().currentUser == null)
-                startActivity(Intent(this, SignUpActivity::class.java))
+                startActivity(Intent(this, SignUpActivity::class.java))  // If no user, go to SignUpActivity
             else
-                startActivity(Intent(this, HomeActivity::class.java))
-            finish()
+                startActivity(Intent(this, HomeActivity::class.java)) // If user exists, go to HomeActivity
+            finish() // Finish this activity
         }, 3000)
 
     }

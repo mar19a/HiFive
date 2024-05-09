@@ -9,6 +9,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.hifive.Models.Reel
 import com.example.hifive.databinding.MyPostRvDesignBinding
 
+//Not used for the final version
 class MyReelAdapter(var context: Context, var reelList: ArrayList<Reel>) :
     RecyclerView.Adapter<MyReelAdapter.ViewHolder>() {
 
