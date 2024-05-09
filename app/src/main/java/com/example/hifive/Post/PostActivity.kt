@@ -90,7 +90,7 @@ class PostActivity : AppCompatActivity() {
                 }
             } else {
                 binding.location.text = ""
-                binding.location.hint = "Choose Location"
+                binding.location.hint = getString(R.string.choose_location)
                 loc_enabled = false
                 binding.postButton.isEnabled = false
             }
@@ -211,11 +211,13 @@ class PostActivity : AppCompatActivity() {
                         }
                 }.addOnFailureListener {
                     // Handle case where the Firestore operation fails
-                    Toast.makeText(this, "Failed to create post. Please try again.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this,
+                        getString(R.string.failed_to_create_post_please_try_again), Toast.LENGTH_SHORT).show()
                 }
             } else {
                 // Handle case where image URL is null
-                Toast.makeText(this, "Please upload an image first.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this,
+                    getString(R.string.please_upload_an_image_first), Toast.LENGTH_SHORT).show()
             }
         }
 

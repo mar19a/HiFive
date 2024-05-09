@@ -94,6 +94,20 @@
     <string name="login">Login</string>
     <string name="create_new_account">Create New Account</string>
     <string name="confirm_location">Confirm Location</string>
+    <string name="new_post">New Post</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="choose_location">Choose Location</string>
+    <string name="set_date">Set Date</string>
+    <string name="set_time">Set Time</string>
+    <string name="event_type">Event Type</string>
+    <string name="other">Other</string>
+    <string name="post_event">Post Event</string>
+    <string name="your_post_may_appear_in_your_followers_feeds_and_can_be_seen_on_the_posts_tab_under_your_profile">Your post may appear in your followers\' feeds and can be seen on the posts tab under your profile.</string>
+    <string name="cancel">Cancel</string>
+    <string name="post">Post</string>
+    <string name="failed_to_create_post_please_try_again">Failed to create post. Please try again.</string>
+    <string name="please_upload_an_image_first">Please upload an image first.</string>
     <string name="hint_write_a_comment">Write A Comment</string>
     <string name="submit">Submit</string>
 

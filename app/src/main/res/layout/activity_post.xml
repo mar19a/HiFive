@@ -18,7 +18,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:title="New Post" />
+        app:title="@string/new_post" />
 
     <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/select_image"
@@ -73,7 +73,7 @@
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Title">
+            android:hint="@string/title">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/titleEditText"
@@ -88,7 +88,7 @@
             android:id="@+id/caption"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Description">
+            android:hint="@string/description">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/descriptionEditText"
@@ -111,7 +111,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:hint="Choose Location"
+        android:hint="@string/choose_location"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/titlecaption"
@@ -137,7 +137,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:layout_weight="1"
-            android:hint="Set Date"
+            android:hint="@string/set_date"
             app:strokeColor="@color/black" />
 
         <Button
@@ -147,7 +147,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:layout_weight="1"
-            android:hint="Set Time"
+            android:hint="@string/set_time"
             app:strokeColor="@color/black" />
 
 
@@ -165,7 +165,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/datetime"
         app:layout_constraintBottom_toTopOf="@+id/post"
-        android:hint="Event Type"
+        android:hint="@string/event_type"
         >
 
         <AutoCompleteTextView
@@ -173,7 +173,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="none"
-            android:text="Other"
+            android:text="@string/other"
             app:simpleItems="@array/event_options"
             />
 
@@ -205,7 +205,7 @@
             android:layout_weight="1"
             android:gravity="center_vertical"
             android:layout_marginLeft="10dp"
-            android:text="Post Event"
+            android:text="@string/post_event"
             android:textSize="16sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -216,7 +216,7 @@
         android:layout_height="wrap_content"
         android:paddingRight="20dp"
         android:paddingLeft="20dp"
-        android:text="Your post may appear in your followers' feeds and can be seen on the posts tab under your profile."
+        android:text="@string/your_post_may_appear_in_your_followers_feeds_and_can_be_seen_on_the_posts_tab_under_your_profile"
         app:layout_constraintStart_toStartOf="@+id/post"
         app:layout_constraintBottom_toTopOf="@+id/cancelpost" />
 
@@ -238,7 +238,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:layout_weight="1"
-            android:text="Cancel"
+            android:text="@string/cancel"
             android:textColor="@android:color/black"
             app:strokeColor="@color/pink" />
 
@@ -250,7 +250,7 @@
             android:layout_weight="1"
             android:backgroundTint="@color/blue"
             android:enabled="false"
-            android:text="Post" />
+            android:text="@string/post" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
