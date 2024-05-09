@@ -9,8 +9,8 @@
     <string-array name="distance_options">
         <item>Any</item>
         <item>&lt; 1 km</item>
-        <item>1 – 2 km</item>
-        <item>2 – 5 km</item>
+        <item>&lt; 2 km</item>
+        <item>&lt; 5 km</item>
         <!-- Add more items as needed -->
     </string-array>
     <string-array name="type_options">
