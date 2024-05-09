@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
@@ -13,23 +12,23 @@
         android:layout_width="600dp"
         android:layout_height="250dp"
         android:visibility="invisible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <ImageView
         android:id="@+id/image"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_margin="10dp"
+        android:adjustViewBounds="true"
         android:scaleType="centerCrop"
         android:src="@drawable/post"
-        android:adjustViewBounds="true"
-        android:layout_margin="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/v1"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.Guideline
@@ -43,11 +42,11 @@
         android:id="@+id/separator"
         android:layout_width="2dp"
         android:layout_height="0dp"
-        android:orientation="vertical"
         android:background="@color/black"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@id/image"
         app:layout_constraintStart_toStartOf="@+id/v1"
         app:layout_constraintTop_toTopOf="@id/image"
-        app:layout_constraintBottom_toBottomOf="@id/image"
         tools:ignore="MissingConstraints" />
 
 
@@ -55,52 +54,53 @@
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
-        android:gravity="center"
         android:layout_margin="10dp"
+        android:gravity="center"
+        android:text="TextView"
         android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/caption"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/v1"
-        app:layout_constraintBottom_toTopOf="@id/caption"
         app:layout_constraintTop_toTopOf="@id/dimensions" />
 
     <TextView
         android:id="@+id/caption"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="TextView"
-        android:gravity="center"
         android:layout_margin="10dp"
+        android:gravity="center"
+        android:text="TextView"
+        android:maxLines="5"
+        app:layout_constraintBottom_toTopOf="@id/address"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/v1"
-        app:layout_constraintBottom_toTopOf="@id/address"
         app:layout_constraintTop_toBottomOf="@id/title" />
 
 
     <TextView
         android:id="@+id/address"
-        android:layout_width="0dp"
+        android:layout_width="254dp"
         android:layout_height="wrap_content"
-        android:text="TextView"
         android:gravity="center"
         android:layout_margin="10dp"
+        android:text="TextView"
         android:textColor="@color/purple_500"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/caption"
         app:layout_constraintStart_toEndOf="@id/v1"
-        app:layout_constraintBottom_toTopOf="@id/datetimemap"
-        app:layout_constraintTop_toBottomOf="@id/title" />
+        tools:layout_editor_absoluteX="147dp"
+        tools:layout_editor_absoluteY="329dp" />
 
 
     <LinearLayout
         android:id="@+id/datetimemap"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="@id/dimensions"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/v1"
-        app:layout_constraintTop_toBottomOf="@id/address"
-        app:layout_constraintBottom_toBottomOf="@id/dimensions" >
+        app:layout_constraintTop_toBottomOf="@id/address">
 
         <TextView
             android:id="@+id/date"
@@ -120,7 +120,7 @@
             android:id="@id/map"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
     </LinearLayout>
 
