@@ -20,7 +20,7 @@
     <View
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/purple_600"
+        android:background="@color/purple_800"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -36,23 +36,33 @@
         app:layout_constraintEnd_toEndOf="parent" >
 
         <ImageView
-            android:id="@+id/imageView2"
+            android:id="@+id/minuszoom"
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:layout_weight="1"
             android:padding="10dp"
             android:layout_marginStart="10dp"
-            android:src="@drawable/pluszoom" />
+            android:src="@drawable/minuszoom" />
 
         <SeekBar
             android:id="@+id/zooming"
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:layout_weight="100"
             android:progress="15"
             android:min="3"
             android:max="21" />
 
-    </LinearLayout>
+        <ImageView
+            android:id="@+id/pluszoom"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:padding="10dp"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/pluszoom" />
 
+    </LinearLayout>
 
     <Button
         android:id="@+id/send"
