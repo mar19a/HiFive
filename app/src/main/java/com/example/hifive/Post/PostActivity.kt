@@ -85,9 +85,9 @@ class PostActivity : AppCompatActivity() {
                 loc = result.data?.getStringExtra("latlong").toString()
                 binding.location.text = addr
                 loc_enabled = true
-                //if (image_enabled) {
-                binding.postButton.isEnabled = true
-                //}
+                if (image_enabled) {
+                    binding.postButton.isEnabled = true
+                }
             } else {
                 binding.location.text = ""
                 binding.location.hint = "Choose Location"

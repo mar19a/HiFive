@@ -190,8 +190,18 @@ class PostAdapter(var context: Context, var postList: ArrayList<Post>) :
     // Format and set the date and time text for a post.
     private fun formatDateTime(holder: MyHolder, date: String, time: String) {
 
-            holder.binding.eventDate.text = "Event happening on $date at $time"
-        }
+        holder.binding.eventDate.text = "Event happening on $date at ${convert24To12(time)}"
+    }
+    private fun convert24To12(time24: String): String {
+        val parts = time24.split(":")
+        val hour = parts[0].toInt()
+        val minute = parts[1]
+
+        val suffix = if (hour < 12) "AM" else "PM"
+        val hour12 = if (hour == 0) 12 else if (hour > 12) hour - 12 else hour
+
+        return String.format("%02d:%s %s", hour12, minute, suffix)
+    }
 
     // Check if the current user has liked a post and update the like button icon accordingly.
     private fun checkLikeStatus(post: Post, holder: MyHolder) {

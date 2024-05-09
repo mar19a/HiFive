@@ -1,6 +1,8 @@
 package com.example.hifive.fragments
 
 
+import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import com.example.hifive.adapters.EventInfoAdapter
 import android.os.Bundle
 import android.util.Log
@@ -29,6 +31,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
+import com.squareup.picasso.Picasso
 
 
 class MapsFragment : Fragment(), OnMapReadyCallback {
@@ -37,7 +40,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
 
-    private var postList = ArrayList<Post>()
+    private var eventList = ArrayList<Post>()
 
     private val mapsVM: MapsViewModel by activityViewModels()
 
@@ -90,9 +93,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         //getLocation()
         mMap = googleMap
 
-        val eventInfoAdapter = EventInfoAdapter(requireContext())
-        mMap.setInfoWindowAdapter(eventInfoAdapter)
-
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mapsVM.getCurrentLocation(), mapsVM.getZoom().toFloat()))
 
         mMap.setOnCameraIdleListener {
@@ -103,9 +103,20 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             // Do something with currentLatLng
         }
 
+//        val animDuration = 2000L // Animation duration in milliseconds
+//
+//        // Define the animation
+//        val anim = ObjectAnimator.ofFloat(binding.eventinfo, "translationY", binding.eventinfo.height.toFloat(), 0f)
+//        anim.duration = animDuration
+//
+//        mMap.setOnMapClickListener {
+//            anim.start()
+//            binding.eventinfo.visibility = View.GONE
+//        }
+
         Firebase.firestore.collection("posts").get().addOnSuccessListener {
             val tempList = ArrayList<Post>()
-            postList.clear()
+            eventList.clear()
             var ploc = LatLng(0.0,0.0)
             for ((index,i) in it.documents.withIndex()) {
 
@@ -125,13 +136,17 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                 } else {
                     BitmapDescriptorFactory.fromResource(R.drawable.markertesto)
                 }
+                Picasso.get().load(tempList[index].postUrl).fetch()
                 mMap.addMarker(MarkerOptions()
                     .position(loc)
                     .title(tempList[index].title)
-                    .snippet("${tempList[index].caption}@${tempList[index].postUrl}")
+                    //.snippet("${tempList[index].caption}@${tempList[index].postUrl}")
+                    .snippet(tempList[index].postId)
                     .icon(icon))
             }
-            postList.addAll(tempList)
+            eventList.addAll(tempList)
+            val eventInfoAdapter = EventInfoAdapter(requireContext(), eventList)
+            mMap.setInfoWindowAdapter(eventInfoAdapter)
             //Log.d("mapsf", postList.size.toString())
         }
         //Log.d("MapsFragment", "distance between ${postList[0].eventLoc} and ${postList[1].eventLoc} =")
