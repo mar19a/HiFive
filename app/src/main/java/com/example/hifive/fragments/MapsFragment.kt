@@ -1,6 +1,7 @@
 package com.example.hifive.fragments
 
 
+import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
@@ -48,6 +49,10 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
     private var markerList = ArrayList<Marker>()
 
+    private var distMarkerList = ArrayList<Marker>()
+
+    private var typeMarkerList = ArrayList<Marker>()
+
     private val mapsVM: MapsViewModel by activityViewModels()
 
     private lateinit var binding: FragmentMapsBinding
@@ -74,12 +79,31 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             AdapterView.OnItemClickListener { parent, _, position, _ -> // Perform action based on the selected item
                 if (::mMap.isInitialized) {
                     circle?.remove()
+                    val mDist = getDistance(parent.getItemAtPosition(position).toString())
                     val circleOptions = CircleOptions()
                         .center(mapsVM.getMyLocation())
-                        .radius(getDistance(parent.getItemAtPosition(position).toString())) // In meters
+                        .radius(mDist) // In meters
+                        .fillColor(R.color.purple_900)
 
-                    Log.d("MapsFragment", "center=${mapsVM.getMyLocation()}, radius=${getDistance(parent.getItemAtPosition(position).toString())}")
+                    Log.d("MapsFragment", "center=${mapsVM.getMyLocation()}, radius(mDist)=${mDist}")
 
+                    for (marker in markerList) {
+                        // Do something with each marker in the list
+                        if (typeMarkerList.contains(marker)) {
+                            val myDist = calcDistance(
+                                mapsVM.getMyLocation(),
+                                LatLng(marker.position.latitude, marker.position.longitude)
+                            )
+                            Log.d("MapsFragment", "${marker}=${myDist}")
+                            if (myDist > mDist && mDist != 0.0) {
+                                marker.isVisible = false
+                                distMarkerList.remove(marker)
+                            } else {
+                                marker.isVisible = true
+                                distMarkerList.add(marker)
+                            }
+                        }
+                    }
                     circle = mMap.addCircle(circleOptions)
                 }
 //                Toast.makeText(
@@ -92,11 +116,35 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         val timeList: AutoCompleteTextView = binding.tlist
         timeList.onItemClickListener =
             AdapterView.OnItemClickListener { parent, _, position, _ -> // Perform action based on the selected item
-                Toast.makeText(
-                    requireContext(),
-                    "Selected: ${parent.getItemAtPosition(position)}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                if (::mMap.isInitialized) {
+                    val mType = parent.getItemAtPosition(position).toString()
+
+                    Log.d("MapsFragment", "center=${mapsVM.getMyLocation()}, time(mTime)=${mType}")
+
+                    markerList.forEachIndexed { index, marker ->
+                        if (distMarkerList.contains(marker)) {
+                            // Do something with each marker in the list
+                            if ((mType == "Social" || mType == "Any") && eventList[index].eventType == "Social") {
+                                marker.isVisible = true
+                                typeMarkerList.add(marker)
+                            } else if ((mType == "Business" || mType == "Any") && eventList[index].eventType == "Business") {
+                                marker.isVisible = true
+                                typeMarkerList.add(marker)
+                            } else if ((mType == "Other" || mType == "Any") && eventList[index].eventType == "Other") {
+                                marker.isVisible = true
+                                typeMarkerList.add(marker)
+                            } else {
+                                marker.isVisible = false
+                                typeMarkerList.remove(marker)
+                            }
+                        }
+                    }
+                }
+//                Toast.makeText(
+//                    requireContext(),
+//                    "Selected: ${parent.getItemAtPosition(position)}",
+//                    Toast.LENGTH_SHORT
+//                ).show()
             }
 
         binding.zooming.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -151,6 +199,8 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             val mList = ArrayList<Marker>()
             eventList.clear()
             markerList.clear()
+            distMarkerList.clear()
+            typeMarkerList.clear()
             var ploc = LatLng(0.0,0.0)
             for ((index,i) in it.documents.withIndex()) {
 
@@ -181,6 +231,9 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             }
             eventList.addAll(eList)
             markerList.addAll(mList)
+            distMarkerList.addAll(mList)
+            typeMarkerList.addAll(mList)
+
             val eventInfoAdapter = EventInfoAdapter(requireContext(), eventList)
             mMap.setInfoWindowAdapter(eventInfoAdapter)
             //Log.d("mapsf", postList.size.toString())
@@ -194,7 +247,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
             // Example: Display a toast with the marker title
             //Toast.makeText(context, "Clicked marker: ${marker.title}", Toast.LENGTH_SHORT).show()
-            Log.d("MapsFragment", "dist = ${calcDistance(mapsVM.getMyLocation(), LatLng(marker.position.latitude, marker.position.longitude), "Km")}")
+            Log.d("MapsFragment", "dist = ${calcDistance(mapsVM.getMyLocation(), LatLng(marker.position.latitude, marker.position.longitude))}")
             false // Return true to consume the event and prevent default behavior (such as showing info window)
         }
    }
@@ -206,9 +259,9 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, resources.getStringArray(R.array.distance_options))
         binding.dlist.setAdapter(distanceAdapter)
 
-        val timeAdapter =
-            ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, resources.getStringArray(R.array.time_options))
-        binding.tlist.setAdapter(timeAdapter)
+        val typeAdapter =
+            ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, resources.getStringArray(R.array.type_options))
+        binding.tlist.setAdapter(typeAdapter)
 
     }
 
@@ -254,19 +307,14 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     }
 
 
-    private fun calcDistance(llng1: LatLng, llng2 : LatLng, type: String) : Float {
+    private fun calcDistance(llng1: LatLng, llng2 : LatLng) : Float {
         val loc1 = Location("llng1")
         val loc2 = Location("llng2")
         loc1.latitude = llng1.latitude
         loc2.latitude = llng2.latitude
         loc1.longitude = llng1.longitude
         loc2.longitude = llng2.longitude
-        return if (type == "Miles")
-            loc1.distanceTo(loc2) / 1609.344f
-        else if (type == "Km")
-            loc1.distanceTo(loc2) / 1000f
-        else
-            loc1.distanceTo(loc2)
+        return loc1.distanceTo(loc2)
 
     }
 

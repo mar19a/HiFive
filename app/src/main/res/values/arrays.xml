@@ -13,11 +13,11 @@
         <item>2 – 5 km</item>
         <!-- Add more items as needed -->
     </string-array>
-    <string-array name="time_options">
+    <string-array name="type_options">
         <item>Any</item>
-        <item>Today</item>
-        <item>This Week</item>
-        <item>This Month</item>
+        <item>Social</item>
+        <item>Business</item>
+        <item>Other</item>
         <!-- Add more items as needed -->
     </string-array>
 </resources>

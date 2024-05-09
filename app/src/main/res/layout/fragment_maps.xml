@@ -56,12 +56,12 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/time"
+            android:id="@+id/type"
             style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="Time"
+            android:hint="Event Type"
             android:textColorHint="@color/white"
             >
 
@@ -74,7 +74,7 @@
                 android:gravity="center"
                 android:textColor="@color/white"
                 android:background="@android:color/holo_purple"
-                app:simpleItems="@array/time_options"
+                app:simpleItems="@array/type_options"
                 />
 
         </com.google.android.material.textfield.TextInputLayout>
