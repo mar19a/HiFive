@@ -10,6 +10,7 @@ import com.example.hifive.R
 import com.example.hifive.databinding.ReelDgBinding
 import com.squareup.picasso.Picasso
 
+//Not used for the final version of the app
 class ReelAdapter(var context:Context,var reelList:ArrayList<Reel>) :RecyclerView.Adapter<ReelAdapter.ViewHolder>(){
 
 

@@ -27,7 +27,7 @@ class SearchFragment : Fragment() {
     var userList = ArrayList<User>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+        super.onCreate(savedInstanceState) // Standard onCreate method in fragments
 
     }
 
@@ -37,55 +37,34 @@ class SearchFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         binding = FragmentSearchBinding.inflate(inflater, container, false)
+        // Setup recycler view with a linear layout manager
         binding.rv.layoutManager = LinearLayoutManager(requireContext())
+        // Initialize the adapter with the context and user list
         adapter = SearchAdapter(requireContext(), userList)
-        binding.rv.adapter = adapter
+        binding.rv.adapter = adapter  // Set the adapter for the recycler view
 
         //Handler For Add Users Button
         binding.addUsersButton.setOnClickListener {
             val intent = Intent(context, AddUserActivity::class.java)
             intent.putExtra("LOGGED_IN_USER", FirebaseAuth.getInstance().currentUser!!.uid)
-            startActivity(intent)
+            startActivity(intent) // Start AddUserActivity on button click
         }
-
-        /*Firebase.firestore.collection(USER_NODE).get().addOnSuccessListener {
-
-            var tempList = ArrayList<User>()
-            userList.clear()
-            for (i in it.documents) {
-                if (i.id.toString().equals(Firebase.auth.currentUser!!.uid.toString())){
-
-                }else{
-                    var user: User = i.toObject<User>()!!
-
-                    tempList.add(user)
-                }
-
-            }
-
-            userList.addAll(tempList)
-            adapter.notifyDataSetChanged()
-
-
-        }
-        */
-
         //Only show users you are already following
         Firebase.firestore.collection(Firebase.auth.currentUser!!.uid + FOLLOW).get()
             .addOnSuccessListener {
                 var tempList=ArrayList<User>()
                 userList.clear()
                 for(i in it.documents){
-                    var user:User=i.toObject<User>()!!
-                    tempList.add(user)
+                    var user:User=i.toObject<User>()!! // Add user to the temporary list
+                    tempList.add(user) // Add user to the temporary list
                 }
-                userList.addAll(tempList)
-                adapter.notifyDataSetChanged()
+                userList.addAll(tempList)  // Update the main user list
+                adapter.notifyDataSetChanged() // Notify the adapter of data change
 
             }
 
         binding.searchButton.setOnClickListener {
-            var text=binding.searchView.text.toString()
+            var text=binding.searchView.text.toString() // Get the text from the search view
 
             Firebase.firestore.collection(USER_NODE).whereEqualTo("name",text).get().addOnSuccessListener {
 
@@ -93,21 +72,22 @@ class SearchFragment : Fragment() {
                     var tempList = ArrayList<User>()
                     userList.clear()
                 if (it.isEmpty){
+                    // Handle empty result set
 
                 }else{
                     for (i in it.documents) {
                         if (i.id.toString().equals(Firebase.auth.currentUser!!.uid.toString())){
-
+                            // Skip the current user
                         }else{
-                            var user: User = i.toObject<User>()!!
+                            var user: User = i.toObject<User>()!!  // Deserialize document to User object
 
-                            tempList.add(user)
+                            tempList.add(user) // Add user to the temporary list
                         }
 
                     }
 
-                    userList.addAll(tempList)
-                    adapter.notifyDataSetChanged()
+                    userList.addAll(tempList) // Update the main user list
+                    adapter.notifyDataSetChanged()  // Notify the adapter of data change
                 }
 
 
@@ -116,7 +96,7 @@ class SearchFragment : Fragment() {
 
         }
 
-        return binding.root
+        return binding.root // Return the root view of the fragment
     }
 
     companion object {

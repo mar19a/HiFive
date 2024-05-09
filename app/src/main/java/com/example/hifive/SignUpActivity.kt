@@ -20,14 +20,17 @@ import com.squareup.picasso.Picasso
 
 
 class SignUpActivity : AppCompatActivity() {
+    // Lazy initialization of binding variable
     private val binding by lazy {
         ActivitySignUpBinding.inflate(layoutInflater)
     }
 
+    // Variable to hold user information, initially null
     private var user: User? = null
-
+    // Register for activity result to get an image from the device gallery
     private val launcher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
+            // If a URI is obtained, upload the image to Firebase and set it as the profile picture
             uploadImage(uri, USER_PROFILE_FOLDER) { url ->
                 url?.let {
                     user?.image = it
@@ -39,15 +42,17 @@ class SignUpActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(binding.root)
+        setContentView(binding.root) // Set the content view to the layout of this activity
 
+        // Set the login text with HTML formatting to highlight the 'Login' part
         val text = "<font color=#FF000000>"+getString(R.string.already_have_an_account)+"</font> <font color=#1E88E5>"+getString(R.string.login)+"</font>"
         binding.login.text = Html.fromHtml(text)
 
-        user = User()
-
+        user = User() // Initialize a new User object
+        // Check if the activity was opened to edit the profile
         if (intent.hasExtra("MODE") && intent.getIntExtra("MODE", -1) == 1) {
             binding.signUpBtn.text = getString(R.string.update_profile_button)
+            // Get current user's information from Firebase Firestore
             Firebase.auth.currentUser?.uid?.let { userId ->
                 Firebase.firestore.collection(USER_NODE).document(userId).get()
                     .addOnSuccessListener { documentSnapshot ->
@@ -109,12 +114,12 @@ class SignUpActivity : AppCompatActivity() {
         }
 
         binding.addImage.setOnClickListener {
-            launcher.launch("image/*")
+            launcher.launch("image/*") // Launch the image picker to select an image
         }
 
         binding.login.setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
-            finish()
+            finish() // Finish this activity after launching the LoginActivity
         }
     }
 }
