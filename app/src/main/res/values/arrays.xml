@@ -6,4 +6,18 @@
     <item>Other</item>
     <!-- Add more items as needed -->
     </string-array>
+    <string-array name="distance_options">
+        <item>Any</item>
+        <item>&lt; 1 km</item>
+        <item>1 – 2 km</item>
+        <item>2 – 5 km</item>
+        <!-- Add more items as needed -->
+    </string-array>
+    <string-array name="time_options">
+        <item>Any</item>
+        <item>Today</item>
+        <item>This Week</item>
+        <item>This Month</item>
+        <!-- Add more items as needed -->
+    </string-array>
 </resources>
