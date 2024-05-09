@@ -1,32 +1,34 @@
 package com.example.hifive.fragments
 
 
-import android.animation.ObjectAnimator
-import android.annotation.SuppressLint
-import com.example.hifive.adapters.EventInfoAdapter
+import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.SeekBar
-import android.location.Location
-
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-
 import com.example.hifive.MapsViewModel
 import com.example.hifive.Models.Post
 import com.example.hifive.R
+import com.example.hifive.adapters.EventInfoAdapter
 import com.example.hifive.databinding.FragmentMapsBinding
-
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.Circle
+import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
@@ -38,9 +40,13 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
     private var mapFragment : SupportMapFragment?=null
 
-    private lateinit var mMap: GoogleMap
+    private lateinit var mMap : GoogleMap
+
+    private var circle: Circle? = null
 
     private var eventList = ArrayList<Post>()
+
+    private var markerList = ArrayList<Marker>()
 
     private val mapsVM: MapsViewModel by activityViewModels()
 
@@ -62,6 +68,36 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
         mapFragment = childFragmentManager.findFragmentById(R.id.mapFragment) as? SupportMapFragment
         mapFragment?.getMapAsync(this)
+
+        val distanceList: AutoCompleteTextView = binding.dlist
+        distanceList.onItemClickListener =
+            AdapterView.OnItemClickListener { parent, _, position, _ -> // Perform action based on the selected item
+                if (::mMap.isInitialized) {
+                    circle?.remove()
+                    val circleOptions = CircleOptions()
+                        .center(mapsVM.getMyLocation())
+                        .radius(getDistance(parent.getItemAtPosition(position).toString())) // In meters
+
+                    Log.d("MapsFragment", "center=${mapsVM.getMyLocation()}, radius=${getDistance(parent.getItemAtPosition(position).toString())}")
+
+                    circle = mMap.addCircle(circleOptions)
+                }
+//                Toast.makeText(
+//                    requireContext(),
+//                    "Selected: ${parent.getItemAtPosition(position)}",
+//                    Toast.LENGTH_SHORT
+//                ).show()
+            }
+
+        val timeList: AutoCompleteTextView = binding.tlist
+        timeList.onItemClickListener =
+            AdapterView.OnItemClickListener { parent, _, position, _ -> // Perform action based on the selected item
+                Toast.makeText(
+                    requireContext(),
+                    "Selected: ${parent.getItemAtPosition(position)}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
 
         binding.zooming.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, newZoom: Int, fromUser: Boolean) {
@@ -111,36 +147,40 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 //        }
 
         Firebase.firestore.collection("posts").get().addOnSuccessListener {
-            val tempList = ArrayList<Post>()
+            val eList = ArrayList<Post>()
+            val mList = ArrayList<Marker>()
             eventList.clear()
+            markerList.clear()
             var ploc = LatLng(0.0,0.0)
             for ((index,i) in it.documents.withIndex()) {
 
                 val post: Post = i.toObject<Post>()!!
-                tempList.add(post)
+                eList.add(post)
                 //Log.d("MapsFragment", tempList[index].eventLoc)
-                val loc = convertStringToLatLng(tempList[index].eventLoc)
+                val loc = convertStringToLatLng(eList[index].eventLoc)
 //                if (index == 0)
 //                    ploc = loc
 //                if (index == 1)
 //                    Log.d("MapsFragment", "distance between ${ploc} and ${loc} = ${calcDistance(ploc, loc, "Miles")}")
                 //Log.d("MapsFragment", loc.toString())
-                val icon: BitmapDescriptor = if (tempList[index].eventType == "Social") {
+                val icon: BitmapDescriptor = if (eList[index].eventType == "Social") {
                     BitmapDescriptorFactory.fromResource(R.drawable.markertest)
-                } else if (tempList[index].eventType == "Business") {
+                } else if (eList[index].eventType == "Business") {
                     BitmapDescriptorFactory.fromResource(R.drawable.markertestb)
                 } else {
                     BitmapDescriptorFactory.fromResource(R.drawable.markertesto)
                 }
-                Picasso.get().load(tempList[index].postUrl).fetch()
-                mMap.addMarker(MarkerOptions()
+                Picasso.get().load(eList[index].postUrl).fetch()
+                val marker = mMap.addMarker(MarkerOptions()
                     .position(loc)
-                    .title(tempList[index].title)
+                    .title(eList[index].title)
                     //.snippet("${tempList[index].caption}@${tempList[index].postUrl}")
-                    .snippet(tempList[index].postId)
-                    .icon(icon))
+                    .snippet(eList[index].postId)
+                    .icon(icon))!!
+                mList.add(marker)
             }
-            eventList.addAll(tempList)
+            eventList.addAll(eList)
+            markerList.addAll(mList)
             val eventInfoAdapter = EventInfoAdapter(requireContext(), eventList)
             mMap.setInfoWindowAdapter(eventInfoAdapter)
             //Log.d("mapsf", postList.size.toString())
@@ -158,6 +198,30 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             false // Return true to consume the event and prevent default behavior (such as showing info window)
         }
    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val distanceAdapter =
+            ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, resources.getStringArray(R.array.distance_options))
+        binding.dlist.setAdapter(distanceAdapter)
+
+        val timeAdapter =
+            ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, resources.getStringArray(R.array.time_options))
+        binding.tlist.setAdapter(timeAdapter)
+
+    }
+
+    private fun getDistance(str: String) : Double {
+        if (str == "< 1 km") {
+            return 1000.0
+        } else if (str == "1 – 2 km") {
+            return 2000.0
+        } else if (str == "2 – 5 km") {
+            return 5000.0
+        } else
+            return 0.0
+    }
 
 
 

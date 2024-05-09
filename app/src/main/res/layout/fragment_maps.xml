@@ -32,7 +32,7 @@
         app:layout_constraintEnd_toEndOf="parent" >
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/f1"
+            android:id="@+id/distance"
             style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -42,20 +42,21 @@
             >
 
             <AutoCompleteTextView
-                android:id="@+id/f1a"
+                android:id="@+id/dlist"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="none"
                 android:background="@color/purple_700"
                 android:textColor="@color/white"
-                android:text="Other"
-                app:simpleItems="@array/event_options"
+                android:text="Any"
+                android:gravity="center"
+                app:simpleItems="@array/distance_options"
                 />
 
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/f2"
+            android:id="@+id/time"
             style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -65,15 +66,15 @@
             >
 
             <AutoCompleteTextView
-                android:id="@+id/f2a"
+                android:id="@+id/tlist"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="none"
-                android:text="Other"
+                android:text="Any"
+                android:gravity="center"
                 android:textColor="@color/white"
                 android:background="@android:color/holo_purple"
-                android:maxLines="1"
-                app:simpleItems="@array/event_options"
+                app:simpleItems="@array/time_options"
                 />
 
         </com.google.android.material.textfield.TextInputLayout>
