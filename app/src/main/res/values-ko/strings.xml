@@ -13,7 +13,7 @@
     <string name="searching_text">주변 유저 찾는중…</string>
     <string name="connected_text">유저 데이터를 보내려면 흔들어주세요!</string>
 
-    <string name="send_user_data">윱저 데이터 보내기</string>
+    <string name="send_user_data">유저 데이터 보내기</string>
     <string name="scan_qr_code">QR 코드를 스캔</string>
     <string name="qr_code_description">사용자 데이터가 포함된 QR 코드입니다</string>
     <string name="invalid_scan">스캔 종료</string>
