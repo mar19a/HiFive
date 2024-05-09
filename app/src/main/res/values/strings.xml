@@ -93,7 +93,7 @@
     <string name="already_have_an_account">Already have an Account?</string>
     <string name="login">Login</string>
     <string name="create_new_account">Create New Account</string>
-    <string name="hint_write_a_comment" translatable="false">Write A Comment</string>
-    <string name="submit" translatable="false">submit</string>
+    <string name="hint_write_a_comment">Write A Comment</string>
+    <string name="submit">Submit</string>
 
 </resources>
