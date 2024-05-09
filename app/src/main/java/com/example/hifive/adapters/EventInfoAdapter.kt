@@ -20,12 +20,12 @@ import com.squareup.picasso.Picasso
 class EventInfoAdapter(var context: Context, private var eventList: ArrayList<Post>) : GoogleMap.InfoWindowAdapter {
 
     override fun getInfoWindow(marker: Marker): View? {
-        // Return null here if you only want the default info window behavior
+        // Return null for default behavior
         return null
     }
 
     override fun getInfoContents(marker: Marker): View {
-        // Inflate your custom layout for the info window
+        // Inflate custom layout for the info window
         val binding = EventInfoBinding.inflate(LayoutInflater.from(context))
 
         val event = eventList.find { it.postId == marker.snippet }
@@ -51,6 +51,7 @@ class EventInfoAdapter(var context: Context, private var eventList: ArrayList<Po
     }
 
     private fun getImageUrl(str: String?) : String {
+        // extracts the imageurl from a marker snippet (if formatted)
         var imageUrl = ""
         val lastIndex = str?.lastIndexOf('@')
         if (str != null) {
@@ -69,6 +70,7 @@ class EventInfoAdapter(var context: Context, private var eventList: ArrayList<Po
     }
 
     private fun convert24To12(time24: String): String {
+        // converts a 24 hour time string to 12 hour
         val parts = time24.split(":")
         val hour = parts[0].toInt()
         val minute = parts[1]
