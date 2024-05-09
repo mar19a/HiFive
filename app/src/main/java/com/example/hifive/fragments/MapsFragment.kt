@@ -242,9 +242,9 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     private fun getDistance(str: String) : Double {
         if (str == "< 1 km") {
             return 1000.0
-        } else if (str == "1 – 2 km") {
+        } else if (str == "< 2 km") {
             return 2000.0
-        } else if (str == "2 – 5 km") {
+        } else if (str == "< 5 km") {
             return 5000.0
         } else
             return 0.0
