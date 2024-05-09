@@ -63,10 +63,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         mapFragment = childFragmentManager.findFragmentById(R.id.mapFragment) as? SupportMapFragment
         mapFragment?.getMapAsync(this)
 
-        binding.b1.setOnClickListener() {
-
-        }
-
         binding.zooming.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, newZoom: Int, fromUser: Boolean) {
                 // Update UI or perform actions based on the progress change
