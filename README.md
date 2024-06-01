@@ -26,6 +26,8 @@
 
 ## Add a Comment
 
+<img width="194" alt="Screenshot 2024-06-01 at 4 19 19 PM" src="https://github.com/mar19a/HiFive/assets/84360137/3dfe3bc4-ef69-44f9-aa40-2bd7df81da17">
+
 ### PostAdapter.kt and CommentAdapter.kt
 - **Purpose:** Load and display comments for posts.
 - **Key Methods:**
@@ -33,6 +35,8 @@
   - `CommentViewHolder`: Sets user’s name, profile image, comment text, and relative time using the TimeAgo library.
 
 ## Add Post
+
+<img width="489" alt="Screenshot 2024-06-01 at 4 19 58 PM" src="https://github.com/mar19a/HiFive/assets/84360137/2b9576ed-2879-4aed-ba11-25dbbb8a9914">
 
 ### AddFragment.kt
 - **Purpose:** Provide a UI for adding different types of content.
