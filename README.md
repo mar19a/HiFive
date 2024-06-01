@@ -1,4 +1,6 @@
-# App Features and Implementation
+# HiFive
+
+This social media application distinguishes itself from others by emphasizing real-life interactions. Users can only add new connections when they are physically close to one another, fostering genuine social interactions. This proximity-based connection feature is powered by the Nearby Connections API, ensuring that users engage with their community in person before extending their network digitally.
 
 ## Home
 <img width="153" alt="Screenshot 2024-06-01 at 4 17 30 PM" src="https://github.com/mar19a/HiFive/assets/84360137/a0b8b8b8-c468-45ba-b6ad-495bcdd76d75"> <img width="154" alt="Screenshot 2024-06-01 at 4 17 43 PM" src="https://github.com/mar19a/HiFive/assets/84360137/b38f967d-ceac-40df-9936-a592dc3a12bd">
