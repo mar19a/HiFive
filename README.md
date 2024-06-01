@@ -1,6 +1,7 @@
 # App Features and Implementation
 
 ## Home
+<img width="153" alt="Screenshot 2024-06-01 at 4 17 30 PM" src="https://github.com/mar19a/HiFive/assets/84360137/a0b8b8b8-c468-45ba-b6ad-495bcdd76d75"> <img width="154" alt="Screenshot 2024-06-01 at 4 17 43 PM" src="https://github.com/mar19a/HiFive/assets/84360137/b38f967d-ceac-40df-9936-a592dc3a12bd">
 
 ### FollowAdapter.kt
 - **Purpose:** Display a list of users that the current user follows in a RecyclerView.
