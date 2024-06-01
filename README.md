@@ -55,6 +55,8 @@
 
 ## Look at Your Posts
 
+<img width="264" alt="Screenshot 2024-06-01 at 4 20 47 PM" src="https://github.com/mar19a/HiFive/assets/84360137/9631101c-f4f3-43fd-a287-7783910edef9">
+
 ### MyPostRvAdapter.kt
 - **Purpose:** Manage and display a list of posts by the current user in a RecyclerView.
 - **Key Methods:**
@@ -70,6 +72,8 @@
 
 ## Look at Your Likes
 
+<img width="249" alt="Screenshot 2024-06-01 at 4 21 22 PM" src="https://github.com/mar19a/HiFive/assets/84360137/f7dba76f-c85a-45a6-aa96-5aa824276e88">
+
 ### MyLikesFragment.kt
 - **Purpose:** Display a list of posts that the user has liked.
 - **Key Methods:**
@@ -77,6 +81,8 @@
   - `loadLikedPosts()`: Fetches liked post IDs from Firebase Firestore and retrieves post details using `fetchPostsByIds()`.
 
 ## Messaging
+
+<img width="502" alt="Screenshot 2024-06-01 at 4 22 15 PM" src="https://github.com/mar19a/HiFive/assets/84360137/b3dbae4d-5585-4c37-b484-f09fe787e91f">
 
 ### MessageAdapter.kt
 - **Purpose:** Manage the display of chat messages in a RecyclerView.
@@ -111,6 +117,8 @@
 
 ## Profile
 
+<img width="592" alt="Screenshot 2024-06-01 at 4 23 31 PM" src="https://github.com/mar19a/HiFive/assets/84360137/84b094d9-17d3-48a7-813d-f2fdb14cca87">
+
 ### ProfileFragment.kt
 - **Purpose:** Provide a space for users to view and edit their profiles.
 - **Key Methods:**
@@ -133,6 +141,8 @@
 
 ## Search
 
+<img width="395" alt="Screenshot 2024-06-01 at 4 24 00 PM" src="https://github.com/mar19a/HiFive/assets/84360137/a498fe52-a9da-4d55-afef-48594cf99a2b">
+
 ### SearchFragment.kt
 - **Purpose:** Search through users the current user is following and navigate to AddUserActivity to follow new users.
 - **Key Components:**
@@ -146,6 +156,8 @@
   - Populating the SearchAdapter RecyclerView with followed/unfollowed users.
 
 ## Maps
+
+<img width="274" alt="Screenshot 2024-06-01 at 4 24 27 PM" src="https://github.com/mar19a/HiFive/assets/84360137/f458b568-acf9-4933-a136-b5e48ccffd46">
 
 ### MapsActivity
 - **Purpose:** Add a location to an event post.
