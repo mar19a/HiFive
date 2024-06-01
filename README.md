@@ -213,7 +213,7 @@ This social media application distinguishes itself from others by emphasizing re
 - **RecyclerView and CardView:** Used appropriately.
 - **Menus:** Implemented effectively.
 - **Gestures and Accelerometer:** Used correctly where needed.
-- **Multi-locale Support:** Targeted multiple locales (e.g., English, Spanish).
+- **Multi-locale Support:** Targeted multiple locales (e.g., English, Korean).
 
 ## References
 
